@@ -10,7 +10,7 @@ const STATUS_CONFIG = {
   CANCELADO:  { label: "Cancelado",  cor: "#C0392B", bg: "#FDE8E8" },
 };
 
-// Mock — trocar por chamada real quando backend estiver pronto
+// Mockado — trocar por chamada real quando backend estiver pronto
 const CONTRATOS_MOCK = [
   { id: 1, anuncio_titulo: "Monitoria de Cálculo I e II", prestador: "Rafael Batista", valor: 35, status: "PENDENTE", criado_em: "01/06/2026" },
   { id: 2, anuncio_titulo: "Instalação elétrica e tomadas", prestador: "Jonas Silva", valor: 120, status: "ATIVO", criado_em: "28/05/2026" },
@@ -44,7 +44,7 @@ export default function MeusContratos() {
   const [nota, setNota] = useState(0);
 
   useEffect(() => {
-    // TODO: reativar após integrar login
+    // reativar dps de integrar login
     // if (!estaLogado()) { navigate("/login"); return; }
 
     listarContratos()

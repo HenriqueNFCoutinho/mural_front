@@ -46,7 +46,7 @@ export default function EditarAnuncio() {
     //   }))
     //   .finally(() => setCarregando(false));
 
-    // Mock temporário
+    // Mockado
     setTimeout(() => {
       setForm({
         categoria_id: "1",

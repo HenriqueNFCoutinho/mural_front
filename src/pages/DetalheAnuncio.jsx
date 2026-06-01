@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { deletarAnuncio, criarContrato, estaLogado, usuarioAtual } from "../services/api";
 import "./DetalheAnuncio.css";
 
-// Mock — trocar por chamada à API depois
+// Mockado — trocar por chamada a API depois
 const ANUNCIOS_MOCK = [
   { id: 1, titulo: "Monitoria de Cálculo I e II", descricao: "Aluno de eng. civil com 2 anos de experiência em monitoria. Resolução de exercícios, listas e provas anteriores. Aulas online ou presenciais no campus. Atendo alunos de todos os níveis, do básico ao avançado.", preco: 35, tipo_preco: "hora", categoria: "Monitoria", prestador: "Rafael Batista", bairro: "Centro", cidade: "Cajazeiras", criado_em: "Jan 2024" },
   { id: 2, titulo: "Instalação elétrica e tomadas", descricao: "Serviços residenciais completos: troca de lâmpadas, disjuntores, tomadas e instalação de ar-condicionado. Trabalho com segurança e materiais de qualidade.", preco: 60, tipo_preco: "hora", categoria: "Reparos", prestador: "Jonas Silva", bairro: "Jardim", cidade: "Cajazeiras", criado_em: "Mar 2024" },
@@ -76,7 +76,6 @@ export default function DetalheAnuncio() {
   return (
     <div className="detalhe-root">
 
-      {/* Navbar */}
       <header className="detalhe-nav">
         <button className="detalhe-back" onClick={() => navigate("/")}>
           <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
@@ -91,7 +90,6 @@ export default function DetalheAnuncio() {
       <div className="detalhe-body">
         <div className="detalhe-card">
 
-          {/* Topo */}
           <div className="detalhe-top">
             <span className="detalhe-cat" style={{ background: cor.bg, color: cor.txt }}>
               {anuncio.categoria}
@@ -102,13 +100,10 @@ export default function DetalheAnuncio() {
             </span>
           </div>
 
-          {/* Título */}
           <h1 className="detalhe-titulo">{anuncio.titulo}</h1>
 
-          {/* Divider */}
           <div className="detalhe-divider" />
 
-          {/* Descrição */}
           <div className="detalhe-section">
             <p className="detalhe-section-label">Sobre o serviço</p>
             <p className="detalhe-desc">{anuncio.descricao}</p>
@@ -116,7 +111,6 @@ export default function DetalheAnuncio() {
 
           <div className="detalhe-divider" />
 
-          {/* Prestador */}
           <div className="detalhe-section">
             <p className="detalhe-section-label">Prestador</p>
             <div className="detalhe-prestador">
@@ -132,7 +126,6 @@ export default function DetalheAnuncio() {
 
           <div className="detalhe-divider" />
 
-          {/* Info rápida */}
           <div className="detalhe-info-row">
             <div className="info-item">
               <p className="info-label">Preço</p>
@@ -150,7 +143,6 @@ export default function DetalheAnuncio() {
 
         </div>
 
-        {/* Botões dono/admin */}
         {(ehDono || ehAdmin) && (
           <div className="detalhe-acoes">
             <button className="btn-editar" onClick={() => navigate(`/editar-anuncio/${anuncio.id}`)}>
@@ -170,7 +162,6 @@ export default function DetalheAnuncio() {
           </div>
         )}
 
-        {/* Avaliação */}
         <div className="avaliacao-card">
           {avaliado ? (
             <div className="avaliacao-sucesso">
@@ -211,7 +202,6 @@ export default function DetalheAnuncio() {
           )}
         </div>
 
-        {/* Botão de contato */}
         {solicitado ? (
           <div className="solicitado-card">
             <span className="solicitado-icon">✓</span>

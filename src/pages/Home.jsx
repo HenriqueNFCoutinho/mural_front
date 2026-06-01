@@ -71,7 +71,6 @@ export default function Home() {
   return (
     <div className="home-root">
 
-      {/* Navbar */}
       <header className="home-nav">
         <span className="home-logo">Faz Tudo</span>
         <div className="home-nav-actions">
@@ -81,7 +80,6 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero */}
       <section className="home-hero">
         <h1 className="hero-title">Serviços perto de você,<br />de quem você já conhece</h1>
         <p className="hero-sub">Encontre bicos, monitorias e pequenos reparos na sua vizinhança.</p>
@@ -99,7 +97,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Categorias */}
       <div className="cat-scroll">
         {CATEGORIAS.map(c => (
           <button
@@ -112,7 +109,6 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Grid */}
       <main className="home-main">
         {carregando ? (
           <div className="estado-centro">

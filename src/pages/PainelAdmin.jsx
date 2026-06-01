@@ -37,7 +37,6 @@ export default function PainelAdmin() {
   return (
     <div className="admin-root">
 
-      {/* Navbar */}
       <header className="admin-nav">
         <span className="admin-logo" onClick={() => navigate("/")}>Faz Tudo</span>
         <div className="admin-nav-info">
@@ -48,7 +47,6 @@ export default function PainelAdmin() {
 
       <div className="admin-body">
 
-        {/* Header da página */}
         <div className="admin-header">
           <div>
             <h1 className="admin-title">Painel de controle</h1>
@@ -60,7 +58,6 @@ export default function PainelAdmin() {
           </div>
         </div>
 
-        {/* Conteúdo */}
         {carregando ? (
           <div className="admin-centro">
             <div className="loading-spinner" />
