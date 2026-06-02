@@ -44,6 +44,7 @@ export const deletarAnuncio   = (id)        => request("DELETE", `/anuncios/${id
 export const listarCategorias = () => request("GET", "/categorias");
 
 export const criarContrato     = (dados)       => request("POST",  "/contratos", dados);
+export const listarContratos   = ()            => request("GET",   "/contratos");
 export const buscarContrato    = (id)          => request("GET",   `/contratos/${id}`);
 export const atualizarContrato = (id, status)  => request("PATCH", `/contratos/${id}/status`, { status });
 

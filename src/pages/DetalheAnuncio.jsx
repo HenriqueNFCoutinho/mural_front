@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { buscarAnuncio, criarContrato, deletarAnuncio, estaLogado } from "../services/api";
+import Navbar from "../components/Navbar";
+import Loading from "../components/Loading";
+import { StarsInput } from "../components/Stars";
 import "./DetalheAnuncio.css";
 
 export default function DetalheAnuncio() {
@@ -11,9 +14,6 @@ export default function DetalheAnuncio() {
   const [confirmando, setConfirmando] = useState(false);
   const [solicitando, setSolicitando] = useState(false);
   const [solicitado, setSolicitado] = useState(false);
-  const [estrelas, setEstrelas] = useState(0);
-  const [estrelasHover, setEstrelasHover] = useState(0);
-  const [avaliado, setAvaliado] = useState(false);
 
   useEffect(() => {
     buscarAnuncio(id)
@@ -23,9 +23,7 @@ export default function DetalheAnuncio() {
   }, [id]);
 
   async function handleDeletar() {
-    try {
-      await deletarAnuncio(id);
-    } catch {}
+    try { await deletarAnuncio(id); } catch {}
     navigate("/");
   }
 
@@ -46,16 +44,11 @@ export default function DetalheAnuncio() {
     }
   }
 
-  if (carregando) return (
-    <div className="detalhe-root">
-      <div className="detalhe-notfound">
-        <div style={{ width: 28, height: 28, border: "3px solid #EDE0D4", borderTopColor: "#C45A10", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-      </div>
-    </div>
-  );
+  if (carregando) return <div className="detalhe-root"><Navbar /><Loading /></div>;
 
   if (!anuncio) return (
     <div className="detalhe-root">
+      <Navbar />
       <div className="detalhe-notfound">
         <p>Anúncio não encontrado.</p>
         <button onClick={() => navigate("/")}>Voltar</button>
@@ -65,18 +58,12 @@ export default function DetalheAnuncio() {
 
   return (
     <div className="detalhe-root">
-      <header className="detalhe-nav">
-        <button className="detalhe-back" onClick={() => navigate("/")}>
-          <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
-            <path d="M12 15L7 10l5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          Voltar
-        </button>
-        <span className="detalhe-nav-title">Detalhe do anúncio</span>
-        <div style={{ width: 80 }} />
-      </header>
-
+      <Navbar />
       <div className="detalhe-body">
+        <button className="detalhe-back" onClick={() => navigate("/")}>
+          ← Voltar ao mural
+        </button>
+
         <div className="detalhe-card">
           <div className="detalhe-top">
             <span className="detalhe-cat" style={{ background: "#F0E4D4", color: "#C45A10" }}>
@@ -122,37 +109,7 @@ export default function DetalheAnuncio() {
           )}
         </div>
 
-        <div className="avaliacao-card">
-          {avaliado ? (
-            <div className="avaliacao-sucesso">
-              <span className="avaliacao-sucesso-icon">✓</span>
-              <p className="avaliacao-sucesso-texto">Obrigado pela avaliação!</p>
-              <div className="estrelas-display">
-                {[1,2,3,4,5].map(i => (
-                  <span key={i} className={`estrela-display${i <= estrelas ? " ativa" : ""}`}>★</span>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <>
-              <p className="avaliacao-titulo">Avalie este serviço</p>
-              <div className="estrelas-row">
-                {[1,2,3,4,5].map(i => (
-                  <button key={i}
-                    className={`estrela${i <= (estrelasHover || estrelas) ? " ativa" : ""}`}
-                    onMouseEnter={() => setEstrelasHover(i)}
-                    onMouseLeave={() => setEstrelasHover(0)}
-                    onClick={() => { setEstrelas(i); setAvaliado(true); }}>★</button>
-                ))}
-              </div>
-              <p className="estrelas-label">
-                {estrelasHover === 1 && "Péssimo"}{estrelasHover === 2 && "Ruim"}
-                {estrelasHover === 3 && "Regular"}{estrelasHover === 4 && "Bom"}
-                {estrelasHover === 5 && "Excelente!"}{!estrelasHover && "Passe o mouse para avaliar"}
-              </p>
-            </>
-          )}
-        </div>
+        <StarsInput />
 
         {solicitado ? (
           <div className="solicitado-card">

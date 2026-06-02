@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { listarUsuarios, deletarUsuario, estaLogado } from "../services/api";
+import Navbar from "../components/Navbar";
+import Loading from "../components/Loading";
 import "./PainelAdmin.css";
 
 function iniciais(nome) {
@@ -35,12 +37,7 @@ export default function PainelAdmin() {
 
   return (
     <div className="admin-root">
-      <header className="admin-nav">
-        <span className="admin-logo" onClick={() => navigate("/")}>Faz Tudo</span>
-        <div className="admin-nav-info">
-          <span className="admin-badge">Admin</span>
-        </div>
-      </header>
+      <Navbar />
       <div className="admin-body">
         <div className="admin-header">
           <div>
@@ -54,7 +51,7 @@ export default function PainelAdmin() {
         </div>
 
         {carregando ? (
-          <div className="admin-centro"><div className="loading-spinner" /><p>Carregando...</p></div>
+          <Loading texto="Carregando usuários..." />
         ) : erro ? (
           <div className="admin-centro"><p className="erro-msg">{erro}</p></div>
         ) : usuarios.length === 0 ? (
