@@ -3,16 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { registrar } from "../services/api";
 import "./Auth.css";
 
-const PERFIS = [
-  { value: "USER", label: "Contratar", desc: "Quero encontrar serviços" },
-  { value: "PRESTADOR", label: "Oferecer", desc: "Quero anunciar meu serviço" },
-  { value: "AMBOS", label: "Ambos", desc: "Quero os dois" },
-];
-
 export default function Register() {
   const [form, setForm] = useState({
     nome: "", email: "", senha: "",
-    perfil: "USER", bairro: "", cidade: "",
+    bairro: "", cidade: "",
   });
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
@@ -46,17 +40,6 @@ export default function Register() {
         <p className="auth-tagline">Crie sua conta gratuitamente</p>
         <h1 className="auth-title">Cadastrar</h1>
         {erro && <div className="auth-erro">{erro}</div>}
-        <p className="perfil-label">Como vai usar a plataforma?</p>
-        <div className="perfil-row">
-          {PERFIS.map((p) => (
-            <button key={p.value} type="button"
-              className={`perfil-opt${form.perfil === p.value ? " selected" : ""}`}
-              onClick={() => setForm({ ...form, perfil: p.value })}>
-              <span className="perfil-name">{p.label}</span>
-              <span className="perfil-desc">{p.desc}</span>
-            </button>
-          ))}
-        </div>
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="field">
             <label>Nome completo</label>
