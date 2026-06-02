@@ -34,7 +34,6 @@ export default function MeusContratos() {
 
   useEffect(() => {
     if (!estaLogado()) { navigate("/login"); return; }
-    setContratos([]);
     setCarregando(false);
   }, []);
 

@@ -1,17 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { criarAnuncio } from "../services/api";
+import { criarAnuncio, listarCategorias } from "../services/api";
 import "./CriarAnuncio.css";
-
-const CATEGORIAS = [
-  { id: 1, label: "Monitoria" },
-  { id: 2, label: "Reparos" },
-  { id: 3, label: "Tecnologia" },
-  { id: 4, label: "Arte & Design" },
-  { id: 5, label: "Entregas" },
-  { id: 6, label: "Jardinagem" },
-  { id: 7, label: "Outros" },
-];
 
 const TIPOS_PRECO = [
   { value: "hora", label: "por hora" },
@@ -25,13 +15,16 @@ export default function CriarAnuncio() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
+  const [categorias, setCategorias] = useState([]);
   const [form, setForm] = useState({
-    categoria_id: "",
-    titulo: "",
-    descricao: "",
-    preco: "",
-    tipo_preco: "hora",
+    categoria_id: "", titulo: "", descricao: "", preco: "", tipo_preco: "hora",
   });
+
+  useEffect(() => {
+    listarCategorias()
+      .then(data => setCategorias(Array.isArray(data) ? data : []))
+      .catch(() => setCategorias([]));
+  }, []);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -84,15 +77,19 @@ export default function CriarAnuncio() {
         <form className="criar-form" onSubmit={handleSubmit}>
           <div className="field">
             <label>Categoria <span className="obrigatorio">*</span></label>
-            <div className="cat-grid">
-              {CATEGORIAS.map(c => (
-                <button key={c.id} type="button"
-                  className={`cat-opt${form.categoria_id === String(c.id) ? " selected" : ""}`}
-                  onClick={() => setForm({ ...form, categoria_id: String(c.id) })}>
-                  {c.label}
-                </button>
-              ))}
-            </div>
+            {categorias.length === 0 ? (
+              <p style={{ fontSize: 13, color: "#9B7355" }}>Carregando categorias...</p>
+            ) : (
+              <div className="cat-grid">
+                {categorias.map(c => (
+                  <button key={c.id} type="button"
+                    className={`cat-opt${form.categoria_id === String(c.id) ? " selected" : ""}`}
+                    onClick={() => setForm({ ...form, categoria_id: String(c.id) })}>
+                    {c.nome}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="field-float">
@@ -128,8 +125,12 @@ export default function CriarAnuncio() {
               <p className="preview-label">Pré-visualização</p>
               <div className="preview-card">
                 <div className="preview-top">
-                  {form.categoria_id && <span className="preview-cat">{CATEGORIAS.find(c => String(c.id) === form.categoria_id)?.label}</span>}
-                  {form.preco && <span className="preview-preco">R$ {form.preco}<span className="preview-tipo">/{form.tipo_preco}</span></span>}
+                  {form.categoria_id && (
+                    <span className="preview-cat">
+                      {categorias.find(c => String(c.id) === form.categoria_id)?.nome}
+                    </span>
+                  )}
+                  {form.preco && <span className="preview-preco">R$ {form.preco}</span>}
                 </div>
                 <p className="preview-titulo">{form.titulo}</p>
                 {form.descricao && <p className="preview-desc">{form.descricao}</p>}

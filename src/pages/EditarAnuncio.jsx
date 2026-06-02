@@ -1,17 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { buscarAnuncio, atualizarAnuncio } from "../services/api";
+import { buscarAnuncio, atualizarAnuncio, listarCategorias } from "../services/api";
 import "./CriarAnuncio.css";
-
-const CATEGORIAS = [
-  { id: 1, label: "Monitoria" },
-  { id: 2, label: "Reparos" },
-  { id: 3, label: "Tecnologia" },
-  { id: 4, label: "Arte & Design" },
-  { id: 5, label: "Entregas" },
-  { id: 6, label: "Jardinagem" },
-  { id: 7, label: "Outros" },
-];
 
 const TIPOS_PRECO = [
   { value: "hora", label: "por hora" },
@@ -27,19 +17,23 @@ export default function EditarAnuncio() {
   const [loading, setLoading] = useState(false);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
+  const [categorias, setCategorias] = useState([]);
   const [form, setForm] = useState({
     categoria_id: "", titulo: "", descricao: "", preco: "", tipo_preco: "hora",
   });
 
   useEffect(() => {
-    buscarAnuncio(id)
-      .then(data => setForm({
-        categoria_id: String(data.categoria_id),
-        titulo: data.titulo,
-        descricao: data.descricao,
-        preco: data.preco,
-        tipo_preco: "hora",
-      }))
+    Promise.all([buscarAnuncio(id), listarCategorias()])
+      .then(([anuncio, cats]) => {
+        setForm({
+          categoria_id: String(anuncio.categoria_id),
+          titulo: anuncio.titulo,
+          descricao: anuncio.descricao,
+          preco: anuncio.preco,
+          tipo_preco: "hora",
+        });
+        setCategorias(Array.isArray(cats) ? cats : []);
+      })
       .catch(() => navigate("/"))
       .finally(() => setCarregando(false));
   }, [id]);
@@ -101,13 +95,13 @@ export default function EditarAnuncio() {
 
         <form className="criar-form" onSubmit={handleSubmit}>
           <div className="field">
-            <label>Categoria <span className="obrigatorio">*</span></label>
+            <label>Categoria</label>
             <div className="cat-grid">
-              {CATEGORIAS.map(c => (
+              {categorias.map(c => (
                 <button key={c.id} type="button"
                   className={`cat-opt${form.categoria_id === String(c.id) ? " selected" : ""}`}
                   onClick={() => setForm({ ...form, categoria_id: String(c.id) })}>
-                  {c.label}
+                  {c.nome}
                 </button>
               ))}
             </div>
