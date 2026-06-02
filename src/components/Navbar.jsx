@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { estaLogado, logout } from "../../services/api";
+import { estaLogado, logout } from "../services/api";
 import "./Navbar.css";
 
 export default function Navbar() {
