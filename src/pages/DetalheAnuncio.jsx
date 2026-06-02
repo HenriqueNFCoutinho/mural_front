@@ -51,8 +51,8 @@ export default function DetalheAnuncio() {
   }
   const usuario = usuarioAtual();
   const anuncio = ANUNCIOS_MOCK.find(a => a.id === Number(id));
-  const ehDono = true; // TODO: remover após integrar login
-  const ehAdmin = true; // TODO: remover após integrar login
+  const ehDono = usuario && anuncio && usuario.id === anuncio.prestador_id;
+  const ehAdmin = usuario?.is_admin;
 
   async function handleDeletar() {
     // TODO: conectar ao Flask

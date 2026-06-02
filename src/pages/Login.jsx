@@ -18,16 +18,14 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setErro("");
-
     try {
-      const res = await login({ email: form.email, senha: form.senha, origem: "usuario" });
-      if (res.is_admin) {
-        navigate("/admin");
-      } else {
+      const res = await login({ email: form.email, senha: form.senha });
+      // backend retorna { status: "success", data: { access_token, token_type } }
+      if (res?.status === "success") {
         navigate("/");
       }
     } catch (err) {
-      setErro(err.response?.data?.message || "E-mail ou senha incorretos.");
+      setErro(err?.erro || "E-mail ou senha incorretos.");
     } finally {
       setLoading(false);
     }
@@ -48,37 +46,22 @@ export default function Login() {
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="field">
             <label>E-mail</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="seu@email.com"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
+            <input type="email" name="email" placeholder="seu@email.com"
+              value={form.email} onChange={handleChange} required />
           </div>
-
           <div className="field">
             <label>Senha</label>
-            <input
-              type="password"
-              name="senha"
-              placeholder="••••••••"
-              value={form.senha}
-              onChange={handleChange}
-              required
-            />
+            <input type="password" name="senha" placeholder="••••••••"
+              value={form.senha} onChange={handleChange} required />
             <a className="forgot" href="#">Esqueci minha senha</a>
           </div>
-
           <button className="btn-submit" type="submit" disabled={loading}>
             {loading ? <span className="spinner" /> : "Entrar"}
           </button>
         </form>
 
         <div className="auth-divider"><span>ou</span></div>
-
-        <button className="btn-admin" onClick={() => navigate("/")}>
+        <button className="btn-admin" onClick={() => navigate("/admin")}>
           Entrar como administrador
         </button>
 

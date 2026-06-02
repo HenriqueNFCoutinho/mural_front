@@ -7,20 +7,23 @@ async function request(method, path, body = null) {
   const config = { method, headers };
   if (body) config.body = JSON.stringify(body);
   const res = await fetch(`${BASE_URL}${path}`, config);
+  if (res.status === 204) return null;
   const data = await res.json();
   if (!res.ok) throw data;
   return data;
 }
 
+// ── Auth ──
 export async function registrar(dados) {
   return request("POST", "/auth/register", dados);
 }
 
 export async function login(dados) {
   const data = await request("POST", "/auth/login", dados);
-  if (data.token) {
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("usuario", JSON.stringify(data.usuario || data));
+  // backend retorna { status, data: { access_token, token_type } }
+  const token = data?.data?.access_token;
+  if (token) {
+    localStorage.setItem("token", token);
   }
   return data;
 }
@@ -30,23 +33,28 @@ export function logout() {
   localStorage.removeItem("usuario");
 }
 
+// ── Helpers ──
 export const estaLogado = () => !!localStorage.getItem("token");
 export const usuarioAtual = () => {
   const u = localStorage.getItem("usuario");
   return u ? JSON.parse(u) : null;
 };
 
-export const listarAnuncios = () => request("GET", "/anuncios");
-export const buscarAnuncio  = (id) => request("GET", `/anuncios/${id}`);
-export const criarAnuncio   = (dados) => request("POST", "/anuncios", dados);
-export const atualizarAnuncio = (id, dados) => request("PATCH", `/anuncios/${id}`, dados);
-export const deletarAnuncio = (id) => request("DELETE", `/anuncios/${id}`);
+// ── Anúncios ──
+export const listarAnuncios  = ()        => request("GET",    "/anuncios");
+export const buscarAnuncio   = (id)      => request("GET",    `/anuncios/${id}`);
+export const criarAnuncio    = (dados)   => request("POST",   "/anuncios", dados);
+export const atualizarAnuncio = (id, dados) => request("PUT", `/anuncios/${id}`, dados);
+export const deletarAnuncio  = (id)      => request("DELETE", `/anuncios/${id}`);
 
-export const criarContrato     = (dados) => request("POST", "/contratos", dados);
-export const listarContratos   = () => request("GET", "/contratos");
-export const atualizarContrato = (id, status) => request("PATCH", `/contratos/${id}/status`, { status });
+// ── Contratos ──
+export const criarContrato     = (dados)        => request("POST",  "/contratos", dados);
+export const buscarContrato    = (id)           => request("GET",   `/contratos/${id}`);
+export const atualizarContrato = (id, status)   => request("PATCH", `/contratos/${id}/status`, { status });
 
+// ── Avaliações ──
 export const criarAvaliacao = (dados) => request("POST", "/avaliacoes", dados);
 
+// ── Admin ──
 export const listarUsuarios = () => request("GET", "/adm/usuarios");
 export const deletarUsuario = (id) => request("DELETE", `/adm/usuarios/${id}`);

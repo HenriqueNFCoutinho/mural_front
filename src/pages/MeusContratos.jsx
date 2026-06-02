@@ -44,8 +44,7 @@ export default function MeusContratos() {
   const [nota, setNota] = useState(0);
 
   useEffect(() => {
-    // reativar dps de integrar login
-    // if (!estaLogado()) { navigate("/login"); return; }
+    if (!estaLogado()) { navigate("/login"); return; }
 
     listarContratos()
       .then(data => setContratos(data))
