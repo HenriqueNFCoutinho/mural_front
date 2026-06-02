@@ -4,33 +4,22 @@ import { listarContratos, atualizarContrato, criarAvaliacao, estaLogado } from "
 import "./MeusContratos.css";
 
 const STATUS_CONFIG = {
-  PENDENTE:   { label: "Pendente",   cor: "#E8A020", bg: "#FFF8E0" },
-  ATIVO:      { label: "Ativo",      cor: "#1D9E75", bg: "#E1F5EE" },
-  CONCLUIDO:  { label: "Concluído",  cor: "#3B5FCC", bg: "#EAF0FF" },
-  CANCELADO:  { label: "Cancelado",  cor: "#C0392B", bg: "#FDE8E8" },
+  PENDENTE:  { label: "Pendente",  cor: "#E8A020", bg: "#FFF8E0" },
+  ATIVO:     { label: "Ativo",     cor: "#1D9E75", bg: "#E1F5EE" },
+  CONCLUIDO: { label: "Concluído", cor: "#3B5FCC", bg: "#EAF0FF" },
+  CANCELADO: { label: "Cancelado", cor: "#C0392B", bg: "#FDE8E8" },
 };
-
-// Mockado — trocar por chamada real quando backend estiver pronto
-const CONTRATOS_MOCK = [
-  { id: 1, anuncio_titulo: "Monitoria de Cálculo I e II", prestador: "Rafael Batista", valor: 35, status: "PENDENTE", criado_em: "01/06/2026" },
-  { id: 2, anuncio_titulo: "Instalação elétrica e tomadas", prestador: "Jonas Silva", valor: 120, status: "ATIVO", criado_em: "28/05/2026" },
-  { id: 3, anuncio_titulo: "Criação de sites e landing pages", prestador: "Ana Melo", valor: 200, status: "CONCLUIDO", criado_em: "20/05/2026", avaliado: false },
-  { id: 4, anuncio_titulo: "Ilustrações e identidade visual", prestador: "Larissa Pereira", valor: 150, status: "CANCELADO", criado_em: "15/05/2026" },
-];
 
 function Stars({ value, onChange }) {
   const [hover, setHover] = useState(0);
   return (
     <div className="stars-input">
       {[1,2,3,4,5].map(i => (
-        <button
-          key={i}
-          type="button"
+        <button key={i} type="button"
           className={`star-btn${i <= (hover || value) ? " ativa" : ""}`}
           onMouseEnter={() => setHover(i)}
           onMouseLeave={() => setHover(0)}
-          onClick={() => onChange(i)}
-        >★</button>
+          onClick={() => onChange(i)}>★</button>
       ))}
     </div>
   );
@@ -45,10 +34,9 @@ export default function MeusContratos() {
 
   useEffect(() => {
     if (!estaLogado()) { navigate("/login"); return; }
-
     listarContratos()
-      .then(data => setContratos(data))
-      .catch(() => setContratos(CONTRATOS_MOCK))
+      .then(data => setContratos(Array.isArray(data) ? data : []))
+      .catch(() => setContratos([]))
       .finally(() => setCarregando(false));
   }, []);
 
@@ -65,10 +53,8 @@ export default function MeusContratos() {
     if (nota === 0) return;
     try {
       await criarAvaliacao({ contrato_id, nota });
-      setContratos(contratos.map(c => c.id === contrato_id ? { ...c, avaliado: true } : c));
-    } catch {
-      setContratos(contratos.map(c => c.id === contrato_id ? { ...c, avaliado: true } : c));
-    }
+    } catch {}
+    setContratos(contratos.map(c => c.id === contrato_id ? { ...c, avaliado: true } : c));
     setAvaliacaoAberta(null);
     setNota(0);
   }
@@ -108,16 +94,16 @@ export default function MeusContratos() {
                 <p className="secao-label">Em andamento</p>
                 <div className="contratos-lista">
                   {ativos.map(c => {
-                    const cfg = STATUS_CONFIG[c.status];
+                    const cfg = STATUS_CONFIG[c.status] || STATUS_CONFIG.PENDENTE;
                     return (
                       <div key={c.id} className="contrato-card">
                         <div className="contrato-top">
                           <span className="contrato-status" style={{ background: cfg.bg, color: cfg.cor }}>{cfg.label}</span>
-                          <span className="contrato-valor">R$ {c.valor}</span>
+                          <span className="contrato-valor">R$ {Number(c.valor_fechado).toFixed(2)}</span>
                         </div>
-                        <p className="contrato-titulo">{c.anuncio_titulo}</p>
-                        <p className="contrato-prestador">Prestador: {c.prestador}</p>
-                        <p className="contrato-data">Solicitado em {c.criado_em}</p>
+                        <p className="contrato-titulo">Contrato #{c.id}</p>
+                        <p className="contrato-prestador">Prestador: #{c.prestador_id}</p>
+                        <p className="contrato-data">Criado em {c.assinado_em ? new Date(c.assinado_em).toLocaleDateString('pt-BR') : '—'}</p>
                         {c.status === "PENDENTE" && (
                           <button className="btn-cancelar" onClick={() => handleCancelar(c.id)}>
                             Cancelar solicitação
@@ -135,16 +121,16 @@ export default function MeusContratos() {
                 <p className="secao-label">Histórico</p>
                 <div className="contratos-lista">
                   {historico.map(c => {
-                    const cfg = STATUS_CONFIG[c.status];
+                    const cfg = STATUS_CONFIG[c.status] || STATUS_CONFIG.CANCELADO;
                     return (
                       <div key={c.id} className="contrato-card">
                         <div className="contrato-top">
                           <span className="contrato-status" style={{ background: cfg.bg, color: cfg.cor }}>{cfg.label}</span>
-                          <span className="contrato-valor">R$ {c.valor}</span>
+                          <span className="contrato-valor">R$ {Number(c.valor_fechado).toFixed(2)}</span>
                         </div>
-                        <p className="contrato-titulo">{c.anuncio_titulo}</p>
-                        <p className="contrato-prestador">Prestador: {c.prestador}</p>
-                        <p className="contrato-data">Solicitado em {c.criado_em}</p>
+                        <p className="contrato-titulo">Contrato #{c.id}</p>
+                        <p className="contrato-prestador">Prestador: #{c.prestador_id}</p>
+                        <p className="contrato-data">Criado em {c.assinado_em ? new Date(c.assinado_em).toLocaleDateString('pt-BR') : '—'}</p>
 
                         {c.status === "CONCLUIDO" && !c.avaliado && (
                           avaliacaoAberta === c.id ? (
@@ -152,21 +138,14 @@ export default function MeusContratos() {
                               <p className="avaliacao-inline-label">Sua nota:</p>
                               <Stars value={nota} onChange={setNota} />
                               <div className="avaliacao-inline-btns">
-                                <button className="btn-avaliar-confirmar" onClick={() => handleAvaliar(c.id)} disabled={nota === 0}>
-                                  Confirmar
-                                </button>
-                                <button className="btn-avaliar-cancelar" onClick={() => { setAvaliacaoAberta(null); setNota(0); }}>
-                                  Cancelar
-                                </button>
+                                <button className="btn-avaliar-confirmar" onClick={() => handleAvaliar(c.id)} disabled={nota === 0}>Confirmar</button>
+                                <button className="btn-avaliar-cancelar" onClick={() => { setAvaliacaoAberta(null); setNota(0); }}>Cancelar</button>
                               </div>
                             </div>
                           ) : (
-                            <button className="btn-avaliar" onClick={() => setAvaliacaoAberta(c.id)}>
-                              ★ Avaliar serviço
-                            </button>
+                            <button className="btn-avaliar" onClick={() => setAvaliacaoAberta(c.id)}>★ Avaliar serviço</button>
                           )
                         )}
-
                         {c.status === "CONCLUIDO" && c.avaliado && (
                           <p className="avaliado-tag">✓ Avaliado</p>
                         )}

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { listarUsuarios, deletarUsuario, usuarioAtual, estaLogado } from "../services/api";
+import { listarUsuarios, deletarUsuario, alternarStatus, estaLogado } from "../services/api";
 import "./PainelAdmin.css";
 
 function iniciais(nome) {
+  if (!nome) return "?";
   return nome.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
 }
 
@@ -13,13 +14,11 @@ export default function PainelAdmin() {
   const [erro, setErro] = useState("");
   const [confirmando, setConfirmando] = useState(null);
   const navigate = useNavigate();
-  const usuario = usuarioAtual();
 
   useEffect(() => {
     if (!estaLogado()) { navigate("/login"); return; }
-
     listarUsuarios()
-      .then(data => setUsuarios(data))
+      .then(data => setUsuarios(Array.isArray(data) ? data : []))
       .catch(() => setErro("Não foi possível carregar os usuários."))
       .finally(() => setCarregando(false));
   }, []);
@@ -34,19 +33,25 @@ export default function PainelAdmin() {
     }
   }
 
+  async function handleAlternarStatus(id, ativo) {
+    try {
+      const atualizado = await alternarStatus(id, !ativo);
+      setUsuarios(usuarios.map(u => u.id === id ? { ...u, ativo: atualizado.ativo } : u));
+    } catch {
+      setErro("Erro ao alterar status.");
+    }
+  }
+
   return (
     <div className="admin-root">
-
       <header className="admin-nav">
         <span className="admin-logo" onClick={() => navigate("/")}>Faz Tudo</span>
         <div className="admin-nav-info">
           <span className="admin-badge">Admin</span>
-          <span className="admin-nome">{usuario?.nome || "Administrador"}</span>
         </div>
       </header>
 
       <div className="admin-body">
-
         <div className="admin-header">
           <div>
             <h1 className="admin-title">Painel de controle</h1>
@@ -59,48 +64,38 @@ export default function PainelAdmin() {
         </div>
 
         {carregando ? (
-          <div className="admin-centro">
-            <div className="loading-spinner" />
-            <p>Carregando usuários...</p>
-          </div>
+          <div className="admin-centro"><div className="loading-spinner" /><p>Carregando...</p></div>
         ) : erro ? (
-          <div className="admin-centro">
-            <p className="erro-msg">{erro}</p>
-          </div>
-        ) : usuarios.length === 0 ? (
-          <div className="admin-centro">
-            <p className="admin-vazio">Nenhum usuário cadastrado ainda.</p>
-          </div>
+          <div className="admin-centro"><p className="erro-msg">{erro}</p></div>
         ) : (
           <div className="admin-tabela">
             <div className="tabela-header">
               <span>Usuário</span>
               <span>E-mail</span>
               <span>Perfil</span>
-              <span>Cidade</span>
+              <span>Status</span>
               <span></span>
             </div>
-
             {usuarios.map(u => (
               <div key={u.id} className="tabela-row">
                 <div className="user-info">
-                  <div className="user-avatar">{iniciais(u.nome || "U")}</div>
+                  <div className="user-avatar">{iniciais(u.nome)}</div>
                   <span className="user-nome">{u.nome}</span>
                 </div>
                 <span className="user-email">{u.email}</span>
-                <span className={`perfil-tag perfil-${u.perfil}`}>{u.perfil || "—"}</span>
-                <span className="user-cidade">{u.cidade || "—"}</span>
+                <span className={`perfil-tag perfil-${u.perfil?.toLowerCase()}`}>{u.perfil}</span>
+                <span style={{ fontSize: 12, color: u.ativo ? "#1D9E75" : "#C0392B", fontWeight: 500 }}>
+                  {u.ativo ? "Ativo" : "Inativo"}
+                </span>
                 <div className="row-actions">
                   {confirmando === u.id ? (
                     <div className="confirm-row">
-                      <span className="confirm-texto">Tem certeza?</span>
+                      <span className="confirm-texto">Confirmar?</span>
                       <button className="btn-sim" onClick={() => handleDeletar(u.id)}>Sim</button>
                       <button className="btn-nao" onClick={() => setConfirmando(null)}>Não</button>
                     </div>
                   ) : (
-                    <button className="btn-deletar" onClick={() => setConfirmando(u.id)}>
-                      Remover
-                    </button>
+                    <button className="btn-deletar" onClick={() => setConfirmando(u.id)}>Remover</button>
                   )}
                 </div>
               </div>

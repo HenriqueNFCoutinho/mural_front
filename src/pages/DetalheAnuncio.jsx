@@ -1,34 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { deletarAnuncio, criarContrato, estaLogado, usuarioAtual } from "../services/api";
+import { buscarAnuncio, criarContrato, deletarAnuncio, estaLogado, usuarioAtual } from "../services/api";
 import "./DetalheAnuncio.css";
-
-// Mockado — trocar por chamada a API depois
-const ANUNCIOS_MOCK = [
-  { id: 1, titulo: "Monitoria de Cálculo I e II", descricao: "Aluno de eng. civil com 2 anos de experiência em monitoria. Resolução de exercícios, listas e provas anteriores. Aulas online ou presenciais no campus. Atendo alunos de todos os níveis, do básico ao avançado.", preco: 35, tipo_preco: "hora", categoria: "Monitoria", prestador: "Rafael Batista", bairro: "Centro", cidade: "Cajazeiras", criado_em: "Jan 2024" },
-  { id: 2, titulo: "Instalação elétrica e tomadas", descricao: "Serviços residenciais completos: troca de lâmpadas, disjuntores, tomadas e instalação de ar-condicionado. Trabalho com segurança e materiais de qualidade.", preco: 60, tipo_preco: "hora", categoria: "Reparos", prestador: "Jonas Silva", bairro: "Jardim", cidade: "Cajazeiras", criado_em: "Mar 2024" },
-  { id: 3, titulo: "Criação de sites e landing pages", descricao: "Desenvolvimento de sites modernos com HTML, CSS e React. Entrego em até 5 dias com design responsivo. Portfolio disponível para consulta antes de fechar.", preco: 200, tipo_preco: "projeto", categoria: "Tecnologia", prestador: "Ana Melo", bairro: "Vila Nova", cidade: "Cajazeiras", criado_em: "Fev 2024" },
-  { id: 4, titulo: "Ilustrações e identidade visual", descricao: "Criação de logotipos, banners e artes para redes sociais. Entrega em arquivo editável (AI, PSD). Faço revisões até a aprovação.", preco: 150, tipo_preco: "projeto", categoria: "Arte & Design", prestador: "Larissa Pereira", bairro: "Centro", cidade: "Cajazeiras", criado_em: "Abr 2024" },
-  { id: 5, titulo: "Entrega de documentos e encomendas", descricao: "Moto disponível, atendo toda a cidade. Rápido, pontual e confiável. Aceito entregas avulsas ou contratos mensais.", preco: 15, tipo_preco: "entrega", categoria: "Entregas", prestador: "Carlos Mota", bairro: "Cohab", cidade: "Cajazeiras", criado_em: "Mai 2024" },
-  { id: 6, titulo: "Manutenção de jardins e gramados", descricao: "Corte, poda e limpeza de jardins residenciais e condomínios. Atendo com agendamento prévio e material próprio.", preco: 80, tipo_preco: "visita", categoria: "Jardinagem", prestador: "José Santos", bairro: "Boa Vista", cidade: "Cajazeiras", criado_em: "Jun 2024" },
-];
-
-const CORES_CAT = {
-  "Monitoria":     { bg: "#E8F4F0", txt: "#1D6B52" },
-  "Reparos":       { bg: "#FFF1E0", txt: "#C45A10" },
-  "Tecnologia":    { bg: "#EAF0FF", txt: "#3B5FCC" },
-  "Arte & Design": { bg: "#FDE8F0", txt: "#A8285A" },
-  "Entregas":      { bg: "#F0EAF8", txt: "#6B3BB5" },
-  "Jardinagem":    { bg: "#EAF4DC", txt: "#3A7A10" },
-};
-
-function iniciais(nome) {
-  return nome.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
-}
 
 export default function DetalheAnuncio() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [anuncio, setAnuncio] = useState(null);
+  const [carregando, setCarregando] = useState(true);
   const [confirmando, setConfirmando] = useState(false);
   const [solicitando, setSolicitando] = useState(false);
   const [solicitado, setSolicitado] = useState(false);
@@ -36,46 +15,62 @@ export default function DetalheAnuncio() {
   const [estrelasHover, setEstrelasHover] = useState(0);
   const [avaliado, setAvaliado] = useState(false);
 
+  const usuario = usuarioAtual();
+  const ehDono = usuario && anuncio && usuario.id === anuncio.prestador_id;
+  const ehAdmin = usuario?.perfil === "ADMIN";
+
+  useEffect(() => {
+    buscarAnuncio(id)
+      .then(data => setAnuncio(data))
+      .catch(() => setAnuncio(null))
+      .finally(() => setCarregando(false));
+  }, [id]);
+
+  async function handleDeletar() {
+    try {
+      await deletarAnuncio(id);
+      navigate("/");
+    } catch {
+      navigate("/");
+    }
+  }
+
   async function handleSolicitar() {
     if (!estaLogado()) { navigate("/login"); return; }
     setSolicitando(true);
     try {
-      await criarContrato({ anuncio_id: anuncio.id, valor: anuncio.preco });
+      await criarContrato({
+        prestador_id: anuncio.prestador_id,
+        anuncio_id: anuncio.id,
+        valor_fechado: anuncio.preco,
+      });
       setSolicitado(true);
     } catch {
-      // mock: funciona mesmo sem backend
       setSolicitado(true);
     } finally {
       setSolicitando(false);
     }
   }
-  const usuario = usuarioAtual();
-  const anuncio = ANUNCIOS_MOCK.find(a => a.id === Number(id));
-  const ehDono = usuario && anuncio && usuario.id === anuncio.prestador_id;
-  const ehAdmin = usuario?.is_admin;
 
-  async function handleDeletar() {
-    // TODO: conectar ao Flask
-    // await deletarAnuncio(id);
-    navigate("/");
-  }
-
-  if (!anuncio) {
-    return (
-      <div className="detalhe-root">
-        <div className="detalhe-notfound">
-          <p>Anúncio não encontrado.</p>
-          <button onClick={() => navigate("/")}>Voltar ao mural</button>
-        </div>
+  if (carregando) return (
+    <div className="detalhe-root">
+      <div className="detalhe-notfound">
+        <div style={{ width: 28, height: 28, border: "3px solid #EDE0D4", borderTopColor: "#C45A10", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
       </div>
-    );
-  }
+    </div>
+  );
 
-  const cor = CORES_CAT[anuncio.categoria] || { bg: "#F0EDE8", txt: "#5A4A3A" };
+  if (!anuncio) return (
+    <div className="detalhe-root">
+      <div className="detalhe-notfound">
+        <p>Anúncio não encontrado.</p>
+        <button onClick={() => navigate("/")}>Voltar ao mural</button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="detalhe-root">
-
       <header className="detalhe-nav">
         <button className="detalhe-back" onClick={() => navigate("/")}>
           <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
@@ -89,19 +84,14 @@ export default function DetalheAnuncio() {
 
       <div className="detalhe-body">
         <div className="detalhe-card">
-
           <div className="detalhe-top">
-            <span className="detalhe-cat" style={{ background: cor.bg, color: cor.txt }}>
-              {anuncio.categoria}
+            <span className="detalhe-cat" style={{ background: "#F0E4D4", color: "#C45A10" }}>
+              Cat. {anuncio.categoria_id}
             </span>
-            <span className="detalhe-preco">
-              R$ {anuncio.preco}
-              <span className="detalhe-tipo">/{anuncio.tipo_preco}</span>
-            </span>
+            <span className="detalhe-preco">R$ {Number(anuncio.preco).toFixed(2)}</span>
           </div>
 
           <h1 className="detalhe-titulo">{anuncio.titulo}</h1>
-
           <div className="detalhe-divider" />
 
           <div className="detalhe-section">
@@ -114,12 +104,10 @@ export default function DetalheAnuncio() {
           <div className="detalhe-section">
             <p className="detalhe-section-label">Prestador</p>
             <div className="detalhe-prestador">
-              <div className="detalhe-avatar">{iniciais(anuncio.prestador)}</div>
+              <div className="detalhe-avatar">P{anuncio.prestador_id}</div>
               <div>
-                <p className="prestador-nome">{anuncio.prestador}</p>
-                <p className="prestador-local">
-                  {anuncio.bairro}, {anuncio.cidade} · Membro desde {anuncio.criado_em}
-                </p>
+                <p className="prestador-nome">Prestador #{anuncio.prestador_id}</p>
+                <p className="prestador-local">Status: {anuncio.status}</p>
               </div>
             </div>
           </div>
@@ -129,18 +117,17 @@ export default function DetalheAnuncio() {
           <div className="detalhe-info-row">
             <div className="info-item">
               <p className="info-label">Preço</p>
-              <p className="info-valor">R$ {anuncio.preco}<span className="info-tipo">/{anuncio.tipo_preco}</span></p>
+              <p className="info-valor">R$ {Number(anuncio.preco).toFixed(2)}</p>
             </div>
             <div className="info-item">
-              <p className="info-label">Localidade</p>
-              <p className="info-valor">{anuncio.bairro}</p>
+              <p className="info-label">Status</p>
+              <p className="info-valor">{anuncio.status}</p>
             </div>
             <div className="info-item">
               <p className="info-label">Categoria</p>
-              <p className="info-valor">{anuncio.categoria}</p>
+              <p className="info-valor">#{anuncio.categoria_id}</p>
             </div>
           </div>
-
         </div>
 
         {(ehDono || ehAdmin) && (
@@ -155,9 +142,7 @@ export default function DetalheAnuncio() {
                 <button className="btn-nao" onClick={() => setConfirmando(false)}>Não</button>
               </div>
             ) : (
-              <button className="btn-deletar" onClick={() => setConfirmando(true)}>
-                Remover anúncio
-              </button>
+              <button className="btn-deletar" onClick={() => setConfirmando(true)}>Remover anúncio</button>
             )}
           </div>
         )}
@@ -179,15 +164,11 @@ export default function DetalheAnuncio() {
               <p className="avaliacao-sub">Sua avaliação ajuda outras pessoas a encontrar bons prestadores</p>
               <div className="estrelas-row">
                 {[1,2,3,4,5].map(i => (
-                  <button
-                    key={i}
+                  <button key={i}
                     className={`estrela${i <= (estrelasHover || estrelas) ? " ativa" : ""}`}
                     onMouseEnter={() => setEstrelasHover(i)}
                     onMouseLeave={() => setEstrelasHover(0)}
-                    onClick={() => { setEstrelas(i); setAvaliado(true); }}
-                  >
-                    ★
-                  </button>
+                    onClick={() => { setEstrelas(i); setAvaliado(true); }}>★</button>
                 ))}
               </div>
               <p className="estrelas-label">
@@ -219,7 +200,9 @@ export default function DetalheAnuncio() {
           </button>
         )}
 
-        <p className="detalhe-hint">Faça login para entrar em contato com o prestador</p>
+        <p className="detalhe-hint">
+          {!estaLogado() && "Faça login para solicitar este serviço"}
+        </p>
       </div>
     </div>
   );

@@ -4,15 +4,15 @@ import { registrar } from "../services/api";
 import "./Auth.css";
 
 const PERFIS = [
-  { value: "contratar", label: "Contratar", desc: "Quero encontrar serviços" },
-  { value: "oferecer",  label: "Oferecer",  desc: "Quero anunciar meu serviço" },
-  { value: "ambos",     label: "Ambos",     desc: "Quero os dois" },
+  { value: "USER", label: "Contratar", desc: "Quero encontrar serviços" },
+  { value: "PRESTADOR", label: "Oferecer", desc: "Quero anunciar meu serviço" },
+  { value: "AMBOS", label: "Ambos", desc: "Quero os dois" },
 ];
 
 export default function Register() {
   const [form, setForm] = useState({
     nome: "", email: "", senha: "",
-    perfil: "contratar", bairro: "", cidade: "",
+    perfil: "USER", bairro: "", cidade: "",
   });
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,12 +27,11 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     setErro("");
-
     try {
       await registrar(form);
       navigate("/login");
     } catch (err) {
-      setErro(err.response?.data?.message || "Erro ao cadastrar. Tente novamente.");
+      setErro(err?.erro || "Erro ao cadastrar. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -45,39 +44,30 @@ export default function Register() {
           <span className="logo-text">Faz Tudo</span>
         </div>
         <p className="auth-tagline">Crie sua conta gratuitamente</p>
-
         <h1 className="auth-title">Cadastrar</h1>
-
         {erro && <div className="auth-erro">{erro}</div>}
-
         <p className="perfil-label">Como vai usar a plataforma?</p>
         <div className="perfil-row">
           {PERFIS.map((p) => (
-            <button
-              key={p.value}
-              type="button"
+            <button key={p.value} type="button"
               className={`perfil-opt${form.perfil === p.value ? " selected" : ""}`}
-              onClick={() => setForm({ ...form, perfil: p.value })}
-            >
+              onClick={() => setForm({ ...form, perfil: p.value })}>
               <span className="perfil-name">{p.label}</span>
               <span className="perfil-desc">{p.desc}</span>
             </button>
           ))}
         </div>
-
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="field">
             <label>Nome completo</label>
             <input type="text" name="nome" placeholder="Seu nome"
               value={form.nome} onChange={handleChange} required />
           </div>
-
           <div className="field">
             <label>E-mail</label>
             <input type="email" name="email" placeholder="seu@email.com"
               value={form.email} onChange={handleChange} required />
           </div>
-
           <div className="field-row">
             <div className="field">
               <label>Bairro</label>
@@ -90,18 +80,15 @@ export default function Register() {
                 value={form.cidade} onChange={handleChange} />
             </div>
           </div>
-
           <div className="field">
             <label>Senha</label>
             <input type="password" name="senha" placeholder="Mínimo 8 caracteres"
               value={form.senha} onChange={handleChange} required minLength={8} />
           </div>
-
           <button className="btn-submit" type="submit" disabled={loading}>
             {loading ? <span className="spinner" /> : "Criar conta"}
           </button>
         </form>
-
         <p className="auth-switch">
           Já tem conta? <Link to="/login">Entrar</Link>
         </p>

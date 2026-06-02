@@ -20,7 +20,6 @@ export default function Login() {
     setErro("");
     try {
       const res = await login({ email: form.email, senha: form.senha });
-      // backend retorna { status: "success", data: { access_token, token_type } }
       if (res?.status === "success") {
         navigate("/");
       }
@@ -38,11 +37,8 @@ export default function Login() {
           <span className="logo-text">Faz Tudo</span>
         </div>
         <p className="auth-tagline">Serviços perto de você, de quem você já conhece</p>
-
         <h1 className="auth-title">Entrar</h1>
-
         {erro && <div className="auth-erro">{erro}</div>}
-
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="field">
             <label>E-mail</label>
@@ -59,12 +55,6 @@ export default function Login() {
             {loading ? <span className="spinner" /> : "Entrar"}
           </button>
         </form>
-
-        <div className="auth-divider"><span>ou</span></div>
-        <button className="btn-admin" onClick={() => navigate("/admin")}>
-          Entrar como administrador
-        </button>
-
         <p className="auth-switch">
           Não tem conta? <Link to="/register">Cadastre-se grátis</Link>
         </p>
