@@ -56,7 +56,7 @@ export default function Home() {
   const filtrados = anuncios.filter(a => {
     const matchCat = categoriaAtiva === null || a.categoria_id === categoriaAtiva;
     const matchBusca = a.titulo?.toLowerCase().includes(busca.toLowerCase()) ||
-                       a.descricao?.toLowerCase().includes(busca.toLowerCase());
+     a.descricao?.toLowerCase().includes(busca.toLowerCase());
     return matchCat && matchBusca;
   });
 

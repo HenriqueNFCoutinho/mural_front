@@ -34,7 +34,6 @@ export default function MeusContratos() {
 
   useEffect(() => {
     if (!estaLogado()) { navigate("/login"); return; }
-    // TODO: rota GET /contratos ainda não implementada no backend
     setContratos([]);
     setCarregando(false);
   }, []);
