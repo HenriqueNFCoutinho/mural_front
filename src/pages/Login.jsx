@@ -19,10 +19,8 @@ export default function Login() {
     setLoading(true);
     setErro("");
     try {
-      const res = await login({ email: form.email, senha: form.senha });
-      if (res?.status === "success") {
-        navigate("/");
-      }
+      await login({ email: form.email, senha: form.senha });
+      navigate("/");
     } catch (err) {
       setErro(err?.erro || "E-mail ou senha incorretos.");
     } finally {
@@ -33,9 +31,7 @@ export default function Login() {
   return (
     <div className="auth-root">
       <div className="auth-card">
-        <div className="auth-logo">
-          <span className="logo-text">Faz Tudo</span>
-        </div>
+        <div className="auth-logo"><span className="logo-text">Faz Tudo</span></div>
         <p className="auth-tagline">Serviços perto de você, de quem você já conhece</p>
         <h1 className="auth-title">Entrar</h1>
         {erro && <div className="auth-erro">{erro}</div>}
@@ -49,15 +45,12 @@ export default function Login() {
             <label>Senha</label>
             <input type="password" name="senha" placeholder="••••••••"
               value={form.senha} onChange={handleChange} required />
-            <a className="forgot" href="#">Esqueci minha senha</a>
           </div>
           <button className="btn-submit" type="submit" disabled={loading}>
             {loading ? <span className="spinner" /> : "Entrar"}
           </button>
         </form>
-        <p className="auth-switch">
-          Não tem conta? <Link to="/register">Cadastre-se grátis</Link>
-        </p>
+        <p className="auth-switch">Não tem conta? <Link to="/register">Cadastre-se</Link></p>
       </div>
     </div>
   );

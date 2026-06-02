@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { buscarAnuncio, criarContrato, deletarAnuncio, estaLogado, usuarioAtual } from "../services/api";
+import { buscarAnuncio, criarContrato, deletarAnuncio, estaLogado } from "../services/api";
 import "./DetalheAnuncio.css";
 
 export default function DetalheAnuncio() {
@@ -15,24 +15,18 @@ export default function DetalheAnuncio() {
   const [estrelasHover, setEstrelasHover] = useState(0);
   const [avaliado, setAvaliado] = useState(false);
 
-  const usuario = usuarioAtual();
-  const ehDono = usuario && anuncio && usuario.id === anuncio.prestador_id;
-  const ehAdmin = usuario?.perfil === "ADMIN";
-
   useEffect(() => {
     buscarAnuncio(id)
       .then(data => setAnuncio(data))
-      .catch(() => setAnuncio(null))
+      .catch(() => navigate("/"))
       .finally(() => setCarregando(false));
   }, [id]);
 
   async function handleDeletar() {
     try {
       await deletarAnuncio(id);
-      navigate("/");
-    } catch {
-      navigate("/");
-    }
+    } catch {}
+    navigate("/");
   }
 
   async function handleSolicitar() {
@@ -64,7 +58,7 @@ export default function DetalheAnuncio() {
     <div className="detalhe-root">
       <div className="detalhe-notfound">
         <p>Anúncio não encontrado.</p>
-        <button onClick={() => navigate("/")}>Voltar ao mural</button>
+        <button onClick={() => navigate("/")}>Voltar</button>
       </div>
     </div>
   );
@@ -86,34 +80,17 @@ export default function DetalheAnuncio() {
         <div className="detalhe-card">
           <div className="detalhe-top">
             <span className="detalhe-cat" style={{ background: "#F0E4D4", color: "#C45A10" }}>
-              Cat. {anuncio.categoria_id}
+              Categoria #{anuncio.categoria_id}
             </span>
             <span className="detalhe-preco">R$ {Number(anuncio.preco).toFixed(2)}</span>
           </div>
-
           <h1 className="detalhe-titulo">{anuncio.titulo}</h1>
           <div className="detalhe-divider" />
-
           <div className="detalhe-section">
             <p className="detalhe-section-label">Sobre o serviço</p>
             <p className="detalhe-desc">{anuncio.descricao}</p>
           </div>
-
           <div className="detalhe-divider" />
-
-          <div className="detalhe-section">
-            <p className="detalhe-section-label">Prestador</p>
-            <div className="detalhe-prestador">
-              <div className="detalhe-avatar">P{anuncio.prestador_id}</div>
-              <div>
-                <p className="prestador-nome">Prestador #{anuncio.prestador_id}</p>
-                <p className="prestador-local">Status: {anuncio.status}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="detalhe-divider" />
-
           <div className="detalhe-info-row">
             <div className="info-item">
               <p className="info-label">Preço</p>
@@ -124,34 +101,32 @@ export default function DetalheAnuncio() {
               <p className="info-valor">{anuncio.status}</p>
             </div>
             <div className="info-item">
-              <p className="info-label">Categoria</p>
-              <p className="info-valor">#{anuncio.categoria_id}</p>
+              <p className="info-label">Prestador</p>
+              <p className="info-valor">#{anuncio.prestador_id}</p>
             </div>
           </div>
         </div>
 
-        {(ehDono || ehAdmin) && (
-          <div className="detalhe-acoes">
-            <button className="btn-editar" onClick={() => navigate(`/editar-anuncio/${anuncio.id}`)}>
-              Editar anúncio
-            </button>
-            {confirmando ? (
-              <div className="confirm-row">
-                <span className="confirm-texto">Tem certeza?</span>
-                <button className="btn-sim" onClick={handleDeletar}>Sim</button>
-                <button className="btn-nao" onClick={() => setConfirmando(false)}>Não</button>
-              </div>
-            ) : (
-              <button className="btn-deletar" onClick={() => setConfirmando(true)}>Remover anúncio</button>
-            )}
-          </div>
-        )}
+        <div className="detalhe-acoes">
+          <button className="btn-editar" onClick={() => navigate(`/editar-anuncio/${anuncio.id}`)}>
+            Editar anúncio
+          </button>
+          {confirmando ? (
+            <div className="confirm-row">
+              <span className="confirm-texto">Tem certeza?</span>
+              <button className="btn-sim" onClick={handleDeletar}>Sim</button>
+              <button className="btn-nao" onClick={() => setConfirmando(false)}>Não</button>
+            </div>
+          ) : (
+            <button className="btn-deletar" onClick={() => setConfirmando(true)}>Remover</button>
+          )}
+        </div>
 
         <div className="avaliacao-card">
           {avaliado ? (
             <div className="avaliacao-sucesso">
               <span className="avaliacao-sucesso-icon">✓</span>
-              <p className="avaliacao-sucesso-texto">Obrigado pela sua avaliação!</p>
+              <p className="avaliacao-sucesso-texto">Obrigado pela avaliação!</p>
               <div className="estrelas-display">
                 {[1,2,3,4,5].map(i => (
                   <span key={i} className={`estrela-display${i <= estrelas ? " ativa" : ""}`}>★</span>
@@ -161,7 +136,6 @@ export default function DetalheAnuncio() {
           ) : (
             <>
               <p className="avaliacao-titulo">Avalie este serviço</p>
-              <p className="avaliacao-sub">Sua avaliação ajuda outras pessoas a encontrar bons prestadores</p>
               <div className="estrelas-row">
                 {[1,2,3,4,5].map(i => (
                   <button key={i}
@@ -172,12 +146,9 @@ export default function DetalheAnuncio() {
                 ))}
               </div>
               <p className="estrelas-label">
-                {estrelasHover === 1 && "Péssimo"}
-                {estrelasHover === 2 && "Ruim"}
-                {estrelasHover === 3 && "Regular"}
-                {estrelasHover === 4 && "Bom"}
-                {estrelasHover === 5 && "Excelente!"}
-                {!estrelasHover && "Passe o mouse para avaliar"}
+                {estrelasHover === 1 && "Péssimo"}{estrelasHover === 2 && "Ruim"}
+                {estrelasHover === 3 && "Regular"}{estrelasHover === 4 && "Bom"}
+                {estrelasHover === 5 && "Excelente!"}{!estrelasHover && "Passe o mouse para avaliar"}
               </p>
             </>
           )}
@@ -199,10 +170,6 @@ export default function DetalheAnuncio() {
             {solicitando ? <span className="spinner-btn" /> : "Solicitar serviço"}
           </button>
         )}
-
-        <p className="detalhe-hint">
-          {!estaLogado() && "Faça login para solicitar este serviço"}
-        </p>
       </div>
     </div>
   );

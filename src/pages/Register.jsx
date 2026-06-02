@@ -4,10 +4,7 @@ import { registrar } from "../services/api";
 import "./Auth.css";
 
 export default function Register() {
-  const [form, setForm] = useState({
-    nome: "", email: "", senha: "",
-    bairro: "", cidade: "",
-  });
+  const [form, setForm] = useState({ nome: "", email: "", senha: "", bairro: "", cidade: "" });
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -22,7 +19,7 @@ export default function Register() {
     setLoading(true);
     setErro("");
     try {
-      await registrar(form);
+      await registrar({ ...form, perfil: "user" });
       navigate("/login");
     } catch (err) {
       setErro(err?.erro || "Erro ao cadastrar. Tente novamente.");
@@ -34,9 +31,7 @@ export default function Register() {
   return (
     <div className="auth-root">
       <div className="auth-card auth-card--wide">
-        <div className="auth-logo">
-          <span className="logo-text">Faz Tudo</span>
-        </div>
+        <div className="auth-logo"><span className="logo-text">Faz Tudo</span></div>
         <p className="auth-tagline">Crie sua conta gratuitamente</p>
         <h1 className="auth-title">Cadastrar</h1>
         {erro && <div className="auth-erro">{erro}</div>}
@@ -72,9 +67,7 @@ export default function Register() {
             {loading ? <span className="spinner" /> : "Criar conta"}
           </button>
         </form>
-        <p className="auth-switch">
-          Já tem conta? <Link to="/login">Entrar</Link>
-        </p>
+        <p className="auth-switch">Já tem conta? <Link to="/login">Entrar</Link></p>
       </div>
     </div>
   );
