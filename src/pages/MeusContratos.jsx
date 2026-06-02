@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { listarContratos, atualizarContrato, criarAvaliacao, estaLogado } from "../services/api";
+import { atualizarContrato, criarAvaliacao, estaLogado } from "../services/api";
 import "./MeusContratos.css";
 
 const STATUS_CONFIG = {
@@ -34,10 +34,9 @@ export default function MeusContratos() {
 
   useEffect(() => {
     if (!estaLogado()) { navigate("/login"); return; }
-    listarContratos()
-      .then(data => setContratos(Array.isArray(data) ? data : []))
-      .catch(() => setContratos([]))
-      .finally(() => setCarregando(false));
+    // TODO: rota GET /contratos ainda não implementada no backend
+    setContratos([]);
+    setCarregando(false);
   }, []);
 
   async function handleCancelar(id) {

@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "http://localhost:8000";
 
 async function request(method, path, body = null) {
   const headers = { "Content-Type": "application/json" };
@@ -46,7 +46,6 @@ export const deletarAnuncio   = (id)         => request("DELETE", `/anuncios/${i
 
 // ── Contratos ──
 export const criarContrato     = (dados)        => request("POST",  "/contratos", dados);
-export const listarContratos   = ()             => request("GET",   "/contratos");
 export const buscarContrato    = (id)           => request("GET",   `/contratos/${id}`);
 export const atualizarContrato = (id, status)   => request("PATCH", `/contratos/${id}/status`, { status });
 
