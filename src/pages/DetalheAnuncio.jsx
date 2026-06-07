@@ -1,15 +1,20 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { buscarAnuncio, criarContrato, deletarAnuncio, estaLogado } from "../services/api";
+import {
+  buscarAnuncio, criarContrato, deletarAnuncio,
+  criarAvaliacao, listarAvaliacoes, estaLogado
+} from "../services/api";
 import Navbar from "../components/Navbar";
 import Loading from "../components/Loading";
 import { StarsInput } from "../components/Stars";
+import ListaAvaliacoes from "../components/ListaAvaliacoes";
 import "./DetalheAnuncio.css";
 
 export default function DetalheAnuncio() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [anuncio, setAnuncio] = useState(null);
+  const [avaliacoes, setAvaliacoes] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [confirmando, setConfirmando] = useState(false);
   const [solicitando, setSolicitando] = useState(false);
@@ -20,6 +25,11 @@ export default function DetalheAnuncio() {
       .then(data => setAnuncio(data))
       .catch(() => navigate("/"))
       .finally(() => setCarregando(false));
+
+    //buscar avaliações (quando tiver rota  no backend)
+    listarAvaliacoes(id)
+      .then(data => setAvaliacoes(Array.isArray(data) ? data : []))
+      .catch(() => setAvaliacoes([]));
   }, [id]);
 
   async function handleDeletar() {
@@ -44,6 +54,11 @@ export default function DetalheAnuncio() {
     }
   }
 
+  async function handleAvaliar({ nota, comentario }) {
+    // quando o backend tiver a rota
+    await criarAvaliacao({ anuncio_id: Number(id), nota, comentario });
+  }
+
   if (carregando) return <div className="detalhe-root"><Navbar /><Loading /></div>;
 
   if (!anuncio) return (
@@ -60,9 +75,7 @@ export default function DetalheAnuncio() {
     <div className="detalhe-root">
       <Navbar />
       <div className="detalhe-body">
-        <button className="detalhe-back" onClick={() => navigate("/")}>
-          ← Voltar ao mural
-        </button>
+        <button className="detalhe-back" onClick={() => navigate("/")}>← Voltar ao mural</button>
 
         <div className="detalhe-card">
           <div className="detalhe-top">
@@ -109,8 +122,6 @@ export default function DetalheAnuncio() {
           )}
         </div>
 
-        <StarsInput />
-
         {solicitado ? (
           <div className="solicitado-card">
             <span className="solicitado-icon">✓</span>
@@ -127,6 +138,13 @@ export default function DetalheAnuncio() {
             {solicitando ? <span className="spinner-btn" /> : "Solicitar serviço"}
           </button>
         )}
+
+        <StarsInput onAvaliar={handleAvaliar} />
+
+        <div className="detalhe-section">
+          <p className="detalhe-section-label">Avaliações</p>
+          <ListaAvaliacoes avaliacoes={avaliacoes} />
+        </div>
       </div>
     </div>
   );

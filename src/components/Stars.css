@@ -84,3 +84,45 @@
   font-weight: 500;
   color: #2D1A08;
 }
+
+.stars-comentario {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1.5px solid #EDE0D4;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: #2D1A08;
+  background: white;
+  outline: none;
+  resize: vertical;
+  min-height: 60px;
+  transition: border-color 0.2s;
+}
+.stars-comentario:focus { border-color: #C45A10; }
+.stars-comentario::placeholder { color: #C4B5A8; }
+
+.stars-enviar {
+  width: 100%;
+  margin-top: 10px;
+  padding: 11px;
+  border-radius: 12px;
+  background: #C45A10;
+  color: white;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.2s;
+}
+.stars-enviar:hover:not(:disabled) { background: #A34A0C; }
+.stars-enviar:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.stars-comentario-enviado {
+  font-size: 13px;
+  color: #7A5A3A;
+  font-style: italic;
+  margin-top: 4px;
+}
