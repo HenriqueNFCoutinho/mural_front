@@ -3,7 +3,6 @@ import { listarAnuncios } from "../services/api";
 import Navbar from "../components/Navbar";
 import CardAnuncio from "../components/CardAnuncio";
 import Loading from "../components/Loading";
-import "./Home.css";
 
 export default function Home() {
   const [anuncios, setAnuncios] = useState([]);

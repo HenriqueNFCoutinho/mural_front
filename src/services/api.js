@@ -41,12 +41,23 @@ export const criarAnuncio     = (dados)     => request("POST",   "/anuncios", da
 export const atualizarAnuncio = (id, dados) => request("PUT",    `/anuncios/${id}`, dados);
 export const deletarAnuncio   = (id)        => request("DELETE", `/anuncios/${id}`);
 
-export const listarCategorias = () => request("GET", "/categorias");
+export const listarCategorias = ()          => request("GET",    "/categorias");
+export const buscarCategoria  = (id)        => request("GET",    `/categorias/${id}`);
+export const criarCategoria   = (dados)     => request("POST",   "/categorias", dados);
+export const atualizarCategoria = (id, dados) => request("PUT",  `/categorias/${id}`, dados);
+export const deletarCategoria = (id)        => request("DELETE", `/categorias/${id}`);
 
 export const criarContrato     = (dados)       => request("POST",  "/contratos", dados);
 export const listarContratos   = ()            => request("GET",   "/contratos");
 export const buscarContrato    = (id)          => request("GET",   `/contratos/${id}`);
 export const atualizarContrato = (id, status)  => request("PATCH", `/contratos/${id}/status`, { status });
 
-export const listarUsuarios  = ()    => request("GET",    "/adm");
-export const deletarUsuario  = (id)  => request("DELETE", `/adm/${id}`);
+export const listarUsuarios      = ()            => request("GET",    "/adm");
+export const buscarUsuario       = (id)          => request("GET",    `/adm/${id}`);
+export const criarUsuarioAdm     = (dados)       => request("POST",   "/adm", dados);
+export const atualizarUsuario    = (id, dados)   => request("PUT",    `/adm/${id}`, dados);
+export const deletarUsuario      = (id)          => request("DELETE", `/adm/${id}`);
+export const filtrarPorPerfil    = (perfil)      => request("GET",    `/adm/filtro-perfil?perfil=${perfil}`);
+export const alternarStatus      = (id, ativo)   => request("PATCH",  `/adm/${id}/status`, { ativo });
+export const alterarPerfil       = (id, perfil)  => request("PATCH",  `/adm/${id}/perfil`, { perfil });
+export const deletarMinhaConta   = ()            => request("DELETE", "/adm/me");
