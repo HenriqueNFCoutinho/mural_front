@@ -1,0 +1,82 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 26, 8, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+  animation: overlay-in 0.2s ease;
+  padding: 20px;
+}
+
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-box {
+  background: var(--card-bg, #fff);
+  border-radius: 18px;
+  padding: 28px;
+  max-width: 380px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  animation: modal-in 0.25s cubic-bezier(0.4,0,0.2,1);
+  font-family: 'Inter', sans-serif;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.92) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-titulo {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text, #2D1A08);
+  margin-bottom: 8px;
+}
+
+.modal-mensagem {
+  font-size: 14px;
+  color: var(--text-sub, #7A5A3A);
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+
+.modal-acoes {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.modal-btn-cancelar {
+  padding: 9px 18px;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-sub, #7A5A3A);
+  border: 1.5px solid var(--border, #EDE0D4);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.modal-btn-cancelar:hover { background: var(--hover, #F0E4D4); }
+
+.modal-btn-confirmar {
+  padding: 9px 18px;
+  border-radius: 10px;
+  background: #C45A10;
+  color: white;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.modal-btn-confirmar:hover { background: #A34A0C; }
+.modal-btn-confirmar.perigo { background: #C0392B; }
+.modal-btn-confirmar.perigo:hover { background: #A02E22; }

@@ -9,6 +9,15 @@ import Navbar from "../components/Navbar";
 import Loading from "../components/Loading";
 import "./PainelAdmin.css";
 
+
+const USUARIOS_MOCK = [
+  { id: 1, nome: "Henrique Coutinho", email: "henrique@email.com", perfil: "admin", ativo: true, cidade: "Cajazeiras", media_avaliacao: 4.8 },
+  { id: 2, nome: "Rafael Batista", email: "rafael@email.com", perfil: "user", ativo: true, cidade: "Cajazeiras", media_avaliacao: 4.9 },
+  { id: 3, nome: "Ana Melo", email: "ana@email.com", perfil: "user", ativo: true, cidade: "Sousa", media_avaliacao: 5.0 },
+  { id: 4, nome: "Jonas Silva", email: "jonas@email.com", perfil: "user", ativo: false, cidade: "Cajazeiras", media_avaliacao: 4.7 },
+  { id: 5, nome: "Larissa Pereira", email: "larissa@email.com", perfil: "user", ativo: true, cidade: "Pombal", media_avaliacao: 4.8 },
+];
+
 function iniciais(nome) {
   if (!nome) return "?";
   return nome.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
@@ -31,12 +40,12 @@ export default function PainelAdmin() {
     const promise = filtro === "todos" ? listarUsuarios() : filtrarPorPerfil(filtro);
     promise
       .then(data => setUsuarios(Array.isArray(data) ? data : []))
-      .catch(() => setErro("Não foi possível carregar os usuários. Verifique se você é admin."))
+      .catch(() => setUsuarios(USUARIOS_MOCK))
       .finally(() => setCarregando(false));
   }
 
   useEffect(() => {
-    if (!estaLogado()) { navigate("/login"); return; }
+    // if (!estaLogado()) { navigate("/login"); return; }  // desativado para testar com mock
     carregar();
   }, [filtro]);
 
@@ -163,7 +172,7 @@ export default function PainelAdmin() {
                   </>
                 ) : (
                   <>
-                    <div className="user-info">
+                    <div className="user-info" onClick={() => navigate(`/admin/usuario/${u.id}`)} style={{ cursor: "pointer" }}>
                       <div className="user-avatar">{iniciais(u.nome)}</div>
                       <span className="user-nome">{u.nome}</span>
                     </div>

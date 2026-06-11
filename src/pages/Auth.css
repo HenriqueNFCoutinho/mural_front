@@ -10,12 +10,12 @@
   justify-content: center;
   padding: 24px;
   font-family: 'Inter', sans-serif;
-  background: #F5EDE3;
+  background: var(--bg);
 }
 
 .auth-card {
-  background: #FFFFFF;
-  border: 1px solid #EDE0D4;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
   border-radius: 20px;
   padding: 40px 36px;
   width: 100%;
@@ -47,14 +47,14 @@
   font-family: 'Inter', sans-serif;
   font-size: 26px;
   font-weight: 600;
-  color: #C45A10;
+  color: var(--accent);
   letter-spacing: -0.5px;
 }
 
 .auth-tagline {
   text-align: center;
   font-size: 13px;
-  color: #9B7355;
+  color: var(--text-mute);
   margin-bottom: 28px;
 }
 
@@ -62,7 +62,7 @@
   font-family: 'Inter', sans-serif;
   font-size: 20px;
   font-weight: 500;
-  color: #2D1A08;
+  color: var(--text);
   margin-bottom: 20px;
 }
 
@@ -92,24 +92,24 @@
   border-radius: 12px;
   font-family: 'Inter', sans-serif;
   font-size: 14px;
-  color: #2D1A08;
-  background: #FFFFFF;
+  color: var(--text);
+  background: var(--card-bg);
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
 .field input:focus {
   border-color: #F07A2A;
-  background: white;
+  background: var(--card-bg);
   box-shadow: 0 0 0 3px rgba(240, 122, 42, 0.12);
 }
 
-.field input::placeholder { color: #C4B5A8; }
+.field input::placeholder { color: var(--text-mute); }
 
 .forgot {
   align-self: flex-end;
   font-size: 12px;
-  color: #C45A10;
+  color: var(--accent);
   text-decoration: none;
   margin-top: 2px;
   cursor: pointer;
@@ -126,8 +126,8 @@
   width: 100%;
   padding: 13px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #F07A2A, #C45A10);
-  color: white;
+  background: linear-gradient(135deg, #F07A2A, var(--accent));
+  color: var(--card-bg);
   border: none;
   font-family: 'Inter', sans-serif;
   font-size: 15px;
@@ -162,7 +162,7 @@
   padding: 11px;
   border-radius: 14px;
   background: transparent;
-  color: #C45A10;
+  color: var(--accent);
   border: 1.5px solid #E8D5C0;
   font-family: 'Inter', sans-serif;
   font-size: 14px;
@@ -179,7 +179,7 @@
 .spinner {
   width: 18px; height: 18px;
   border: 2.5px solid rgba(255,255,255,0.4);
-  border-top-color: white;
+  border-top-color: var(--card-bg);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   display: inline-block;
@@ -193,7 +193,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #C4B5A8;
+  color: var(--text-mute);
   font-size: 12px;
   margin: 14px 0;
 }
@@ -209,12 +209,12 @@
 .auth-switch {
   text-align: center;
   font-size: 13px;
-  color: #9B7355;
+  color: var(--text-mute);
   margin-top: 18px;
 }
 
 .auth-switch a {
-  color: #C45A10;
+  color: var(--accent);
   font-weight: 500;
   text-decoration: none;
 }
@@ -245,7 +245,7 @@
   padding: 12px 8px;
   border-radius: 14px;
   border: 1.5px solid #E8D5C0;
-  background: #FFFFFF;
+  background: var(--card-bg);
   cursor: pointer;
   transition: all 0.2s;
   font-family: 'DM Sans', sans-serif;
@@ -267,12 +267,12 @@
 .perfil-name {
   font-size: 13px;
   font-weight: 500;
-  color: #2D1A08;
+  color: var(--text);
 }
 
 .perfil-desc {
   font-size: 11px;
-  color: #9B7355;
+  color: var(--text-mute);
   text-align: center;
   line-height: 1.3;
 }

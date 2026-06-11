@@ -6,6 +6,7 @@ import CriarAnuncio from "./pages/CriarAnuncio";
 import EditarAnuncio from "./pages/EditarAnuncio";
 import DetalheAnuncio from "./pages/DetalheAnuncio";
 import PainelAdmin from "./pages/PainelAdmin";
+import DetalheUsuario from "./pages/DetalheUsuario";
 import MeusContratos from "./pages/MeusContratos";
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/editar-anuncio/:id" element={<EditarAnuncio />} />
         <Route path="/anuncio/:id" element={<DetalheAnuncio />} />
         <Route path="/admin" element={<PainelAdmin />} />
+        <Route path="/admin/usuario/:id" element={<DetalheUsuario />} />
         <Route path="/meus-contratos" element={<MeusContratos />} />
       </Routes>
     </BrowserRouter>

@@ -1,8 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-
 .card {
-  background: white;
-  border: 1px solid #EDE0D4;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 20px;
   cursor: pointer;
@@ -14,42 +12,29 @@
 }
 
 .card:hover {
-  border-color: #C45A10;
+  border-color: var(--accent);
   box-shadow: 0 4px 20px rgba(196, 90, 16, 0.1);
   transform: translateY(-2px);
 }
 
-.card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+.card-top { display: flex; align-items: center; justify-content: space-between; }
 
 .card-cat-badge {
   font-size: 11px;
   font-weight: 500;
   padding: 4px 10px;
   border-radius: 20px;
-  background: #F0E4D4;
-  color: #C45A10;
+  background: var(--hover);
+  color: var(--accent);
 }
 
-.card-preco {
-  font-size: 17px;
-  font-weight: 500;
-  color: #C45A10;
-}
+.card-preco { font-size: 17px; font-weight: 500; color: var(--accent); }
 
-.card-titulo {
-  font-size: 16px;
-  font-weight: 500;
-  color: #2D1A08;
-  line-height: 1.4;
-}
+.card-titulo { font-size: 16px; font-weight: 500; color: var(--text); line-height: 1.4; }
 
 .card-desc {
   font-size: 13px;
-  color: #7A5A3A;
+  color: var(--text-sub);
   line-height: 1.6;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -63,21 +48,17 @@
   align-items: center;
   justify-content: space-between;
   padding-top: 10px;
-  border-top: 1px solid #F5EDE3;
+  border-top: 1px solid var(--border);
 }
 
-.card-author {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+.card-author { display: flex; align-items: center; gap: 8px; }
 
 .avatar {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #F0E4D4;
-  color: #C45A10;
+  background: var(--hover);
+  color: var(--accent);
   font-size: 11px;
   font-weight: 500;
   display: flex;
@@ -85,20 +66,7 @@
   justify-content: center;
 }
 
-.author-nome {
-  font-size: 12px;
-  color: #7A5A3A;
-}
+.author-nome { font-size: 12px; color: var(--text-sub); }
 
-.card-stars {
-  display: flex;
-  align-items: center;
-  gap: 1px;
-}
-
-.card-media {
-  font-size: 12px;
-  color: #9B7355;
-  margin-left: 4px;
-  font-weight: 500;
-}
+.card-stars { display: flex; align-items: center; gap: 1px; }
+.card-media { font-size: 12px; color: var(--text-mute); margin-left: 4px; font-weight: 500; }

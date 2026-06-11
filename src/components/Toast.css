@@ -1,0 +1,51 @@
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+  font-family: 'Inter', sans-serif;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 240px;
+  max-width: 360px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  background: var(--card-bg, #fff);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+  border: 1px solid var(--border, #EDE0D4);
+  animation: toast-in 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.toast-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.toast-sucesso .toast-icon { background: #1D9E75; }
+.toast-erro .toast-icon { background: #C0392B; }
+.toast-info .toast-icon { background: #3B5FCC; }
+
+.toast-msg {
+  font-size: 14px;
+  color: var(--text, #2D1A08);
+}

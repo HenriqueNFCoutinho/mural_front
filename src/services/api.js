@@ -13,10 +13,27 @@ async function request(method, path, body = null) {
   return data;
 }
 
+function idDoToken() {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.sub || payload.identity || null;
+  } catch {
+    return null;
+  }
+}
+
 export async function login(dados) {
   const data = await request("POST", "/auth/login", dados);
   const token = data?.data?.access_token;
   if (token) localStorage.setItem("token", token);
+  try {
+    await request("GET", "/adm");
+    localStorage.setItem("perfil", "admin");
+  } catch {
+    localStorage.setItem("perfil", "user");
+  }
   return data;
 }
 
@@ -26,14 +43,12 @@ export async function registrar(dados) {
 
 export function logout() {
   localStorage.removeItem("token");
-  localStorage.removeItem("usuario");
+  localStorage.removeItem("perfil");
 }
 
 export const estaLogado  = () => !!localStorage.getItem("token");
-export const usuarioAtual = () => {
-  const u = localStorage.getItem("usuario");
-  return u ? JSON.parse(u) : null;
-};
+export const ehAdmin     = () => localStorage.getItem("perfil") === "admin";
+export const meuId       = () => idDoToken();
 
 export const listarAnuncios   = ()          => request("GET",    "/anuncios");
 export const buscarAnuncio    = (id)        => request("GET",    `/anuncios/${id}`);
@@ -52,9 +67,9 @@ export const listarContratos   = ()            => request("GET",   "/contratos")
 export const buscarContrato    = (id)          => request("GET",   `/contratos/${id}`);
 export const atualizarContrato = (id, status)  => request("PATCH", `/contratos/${id}/status`, { status });
 
-export const criarAvaliacao        = (dados)        => request("POST", "/avaliacoes", dados);
-export const listarAvaliacoes      = (anuncioId)    => request("GET",  `/anuncios/${anuncioId}/avaliacoes`);
-export const avaliacaoDoContrato   = (contratoId)   => request("GET",  `/contratos/${contratoId}/avaliacao`);
+export const criarAvaliacao      = (dados)      => request("POST", "/avaliacoes", dados);
+export const listarAvaliacoes    = (anuncioId)  => request("GET",  `/anuncios/${anuncioId}/avaliacoes`);
+export const avaliacaoDoContrato = (contratoId) => request("GET",  `/contratos/${contratoId}/avaliacao`);
 
 export const listarUsuarios    = ()           => request("GET",    "/adm");
 export const buscarUsuario     = (id)         => request("GET",    `/adm/${id}`);

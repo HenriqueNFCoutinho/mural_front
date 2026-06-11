@@ -1,0 +1,46 @@
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
+}
+
+.skeleton-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sk-line, .sk-top { display: flex; align-items: center; justify-content: space-between; }
+.sk-footer { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+
+.sk-badge, .sk-preco, .sk-titulo, .sk-desc, .sk-avatar, .sk-nome, .sk-email {
+  background: linear-gradient(90deg, var(--border) 25%, var(--hover) 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  to { background-position: -200% 0; }
+}
+
+.sk-badge { width: 60px; height: 18px; border-radius: 20px; }
+.sk-preco { width: 50px; height: 18px; }
+.sk-titulo { width: 70%; height: 16px; }
+.sk-desc { width: 100%; height: 12px; }
+.sk-desc-curto { width: 60%; }
+.sk-avatar { width: 28px; height: 28px; border-radius: 50%; }
+.sk-nome { width: 90px; height: 12px; }
+.sk-email { width: 160px; height: 12px; }

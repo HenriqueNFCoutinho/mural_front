@@ -1,10 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { estaLogado, logout } from "../services/api";
+import { estaLogado, ehAdmin, logout } from "../services/api";
+import { useTheme } from "./Themecontext";
 import "./Navbar.css";
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const { tema, alternarTema } = useTheme();
   const logado = estaLogado();
+  const admin = ehAdmin();
 
   function handleLogout() {
     logout();
@@ -15,10 +18,13 @@ export default function Navbar() {
     <header className="navbar">
       <span className="navbar-logo" onClick={() => navigate("/")}>Faz Tudo</span>
       <div className="navbar-actions">
+        <button className="nav-tema" onClick={alternarTema} title="Alternar tema">
+          {tema === "claro" ? "🌙" : "☀️"}
+        </button>
         {logado ? (
           <>
             <button className="nav-link" onClick={() => navigate("/meus-contratos")}>Meus contratos</button>
-            <button className="nav-link" onClick={() => navigate("/admin")}>Admin</button>
+            {admin && <button className="nav-link" onClick={() => navigate("/admin")}>Admin</button>}
             <button className="nav-link" onClick={handleLogout}>Sair</button>
             <button className="nav-btn-primary" onClick={() => navigate("/criar-anuncio")}>+ Anunciar</button>
           </>

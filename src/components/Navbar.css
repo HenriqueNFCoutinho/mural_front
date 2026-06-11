@@ -1,12 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-
 .navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 16px 32px;
-  background: #FFFAF5;
-  border-bottom: 1px solid #EDE0D4;
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -16,7 +14,7 @@
 .navbar-logo {
   font-size: 22px;
   font-weight: 600;
-  color: #C45A10;
+  color: var(--accent);
   cursor: pointer;
   letter-spacing: -0.3px;
 }
@@ -27,21 +25,36 @@
   gap: 10px;
 }
 
+.nav-tema {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.nav-tema:hover { background: var(--hover); }
+
 .nav-link {
   background: none;
   border: none;
   font-family: 'Inter', sans-serif;
   font-size: 14px;
-  color: #7A5A3A;
+  color: var(--text-sub);
   cursor: pointer;
   padding: 8px 14px;
   border-radius: 10px;
   transition: background 0.15s;
 }
-.nav-link:hover { background: #F0E4D4; }
+.nav-link:hover { background: var(--hover); }
 
 .nav-btn-primary {
-  background: #C45A10;
+  background: var(--accent);
   color: white;
   border: none;
   font-family: 'Inter', sans-serif;
@@ -52,4 +65,4 @@
   cursor: pointer;
   transition: background 0.15s;
 }
-.nav-btn-primary:hover { background: #A34A0C; }
+.nav-btn-primary:hover { background: var(--accent-hover); }
