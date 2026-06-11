@@ -7,13 +7,6 @@ import Modal from "../components/Modal";
 import { useToast } from "../components/Toast";
 import "./MeusContratos.css";
 
-const CONTRATOS_MOCK = [
-  { id: 1, prestador_id: 2, valor_fechado: 35, status: "pendente", assinado_em: "2026-05-20" },
-  { id: 2, prestador_id: 3, valor_fechado: 120, status: "ativo", assinado_em: "2026-05-22" },
-  { id: 3, prestador_id: 4, valor_fechado: 80, status: "concluido", assinado_em: "2026-05-10", avaliado: false },
-  { id: 4, prestador_id: 5, valor_fechado: 200, status: "concluido", assinado_em: "2026-04-28", avaliado: true, avaliacao: { nota: 5, comentario: "Excelente servico, super recomendo!" } },
-  { id: 5, prestador_id: 2, valor_fechado: 50, status: "cancelado", assinado_em: "2026-05-01" },
-];
 
 const STATUS_CONFIG = {
   pendente:  { label: "Pendente",  cor: "#E8A020", bg: "#FFF8E0" },
@@ -62,7 +55,7 @@ export default function MeusContratos() {
     if (!estaLogado()) { navigate("/login"); return; }
     listarContratos()
       .then(data => setContratos(Array.isArray(data) ? data : []))
-      .catch(() => setContratos(CONTRATOS_MOCK))
+      .catch(() => setContratos([]))
       .finally(() => setCarregando(false));
   }, []);
 

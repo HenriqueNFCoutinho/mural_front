@@ -12,14 +12,6 @@ import "./DetalheUsuario.css";
 const CORES = ["#C45A10", "#1D9E75", "#3B5FCC", "#A8285A", "#6B3BB5", "#3A7A10", "#E8A020"];
 
 
-const USUARIO_MOCK = { id: 0, nome: "Usuário Exemplo", email: "exemplo@email.com", perfil: "user", ativo: true, cidade: "Cajazeiras", media_avaliacao: 4.8 };
-const ANUNCIOS_MOCK = [
-  { id: 1, prestador_id: 0, categoria_id: 1, titulo: "Monitoria de Cálculo", preco: 35, status: "ativo" },
-  { id: 2, prestador_id: 0, categoria_id: 1, titulo: "Monitoria de Física", preco: 40, status: "ativo" },
-  { id: 3, prestador_id: 0, categoria_id: 3, titulo: "Criação de site", preco: 200, status: "concluido" },
-  { id: 4, prestador_id: 0, categoria_id: 2, titulo: "Reparo elétrico", preco: 60, status: "ativo" },
-  { id: 5, prestador_id: 0, categoria_id: 3, titulo: "App mobile", preco: 500, status: "inativo" },
-];
 
 function iniciais(nome) {
   if (!nome) return "?";
@@ -34,7 +26,7 @@ export default function DetalheUsuario() {
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
-    // if (!estaLogado()) { navigate("/login"); return; }  // desativado para testar com mock
+    if (!estaLogado()) { navigate("/login"); return; }
     Promise.all([buscarUsuario(id), listarAnuncios()])
       .then(([user, todosAnuncios]) => {
         setUsuario(user);
@@ -42,10 +34,7 @@ export default function DetalheUsuario() {
           .filter(a => a.prestador_id === Number(id));
         setAnuncios(doUsuario);
       })
-      .catch(() => {
-        setUsuario(USUARIO_MOCK);
-        setAnuncios(ANUNCIOS_MOCK);
-      })
+      .catch(() => navigate("/admin"))
       .finally(() => setCarregando(false));
   }, [id]);
 

@@ -1,155 +1,153 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { buscarAnuncio, criarContrato, deletarAnuncio, listarAvaliacoes, estaLogado } from "../services/api";
+import { buscarUsuario, listarAnuncios, estaLogado } from "../services/api";
 import Navbar from "../components/Navbar";
 import Loading from "../components/Loading";
-import Modal from "../components/Modal";
-import ListaAvaliacoes from "../components/ListaAvaliacoes";
-import { useToast } from "../components/Toast";
-import "./DetalheAnuncio.css";
+import {
+  BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis,
+  ResponsiveContainer, Tooltip, Legend
+} from "recharts";
+import "./DetalheUsuario.css";
 
-const ANUNCIOS_MOCK = {
-  1: { id: 1, prestador_id: 2, prestador_nome: "Rafael Batista", telefone: "83999990001", categoria_id: 1, titulo: "Monitoria de Calculo I", descricao: "Ajudo com limites, derivadas e integrais. Aulas presenciais ou online, material incluso.", preco: 35, status: "ativo" },
-  2: { id: 2, prestador_id: 3, prestador_nome: "Ana Melo", telefone: "83999990002", categoria_id: 2, titulo: "Reparos eletricos residenciais", descricao: "Tomadas, chuveiros, disjuntores. Atendimento rapido na sua casa.", preco: 80, status: "ativo" },
-  3: { id: 3, prestador_id: 4, prestador_nome: "Jonas Silva", telefone: "83999990003", categoria_id: 3, titulo: "Criacao de sites e landing pages", descricao: "Desenvolvo sites modernos e responsivos para o seu negocio.", preco: 350, status: "ativo" },
-};
+const CORES = ["#C45A10", "#1D9E75", "#3B5FCC", "#A8285A", "#6B3BB5", "#3A7A10", "#E8A020"];
 
-const AVALIACOES_MOCK = [
-  { id: 1, nota: 5, comentario: "Profissional excelente, super pontual!", criado_em: "2026-05-15" },
-  { id: 2, nota: 4, comentario: "Bom servico, recomendo.", criado_em: "2026-05-10" },
-];
 
-export default function DetalheAnuncio() {
+
+function iniciais(nome) {
+  if (!nome) return "?";
+  return nome.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
+}
+
+export default function DetalheUsuario() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const toast = useToast();
-  const [anuncio, setAnuncio] = useState(null);
-  const [avaliacoes, setAvaliacoes] = useState([]);
+  const [usuario, setUsuario] = useState(null);
+  const [anuncios, setAnuncios] = useState([]);
   const [carregando, setCarregando] = useState(true);
-  const [modalRemover, setModalRemover] = useState(false);
-  const [solicitando, setSolicitando] = useState(false);
-  const [solicitado, setSolicitado] = useState(false);
 
   useEffect(() => {
-    buscarAnuncio(id)
-      .then(data => setAnuncio(data))
-      .catch(() => setAnuncio(ANUNCIOS_MOCK[id] || ANUNCIOS_MOCK[1]))
+    if (!estaLogado()) { navigate("/login"); return; }
+    Promise.all([buscarUsuario(id), listarAnuncios()])
+      .then(([user, todosAnuncios]) => {
+        setUsuario(user);
+        const doUsuario = (Array.isArray(todosAnuncios) ? todosAnuncios : [])
+          .filter(a => a.prestador_id === Number(id));
+        setAnuncios(doUsuario);
+      })
+      .catch(() => navigate("/admin"))
       .finally(() => setCarregando(false));
-
-    listarAvaliacoes(id)
-      .then(data => setAvaliacoes(Array.isArray(data) && data.length ? data : AVALIACOES_MOCK))
-      .catch(() => setAvaliacoes(AVALIACOES_MOCK));
   }, [id]);
 
-  async function handleDeletar() {
-    try { await deletarAnuncio(id); } catch {}
-    toast("Anuncio removido.", "info");
-    navigate("/");
-  }
+  if (carregando) return <div className="du-root"><Navbar /><Loading texto="Carregando perfil..." /></div>;
+  if (!usuario) return null;
 
-  async function handleSolicitar() {
-    if (!estaLogado()) { navigate("/login"); return; }
-    setSolicitando(true);
-    try {
-      await criarContrato({
-        prestador_id: anuncio.prestador_id,
-        anuncio_id: anuncio.id,
-        valor_fechado: anuncio.preco,
-      });
-    } catch {}
-    toast("Servico solicitado!", "sucesso");
-    setSolicitado(true);
-    setSolicitando(false);
-  }
+  const porCategoria = {};
+  anuncios.forEach(a => {
+    const cat = `Cat. ${a.categoria_id}`;
+    porCategoria[cat] = (porCategoria[cat] || 0) + 1;
+  });
+  const dadosCategoria = Object.entries(porCategoria).map(([nome, qtd]) => ({ nome, qtd }));
 
-  function abrirWhatsApp() {
-    const tel = anuncio.telefone?.replace(/\D/g, "");
-    if (!tel) { toast("Telefone nao disponivel.", "erro"); return; }
-    const msg = encodeURIComponent(`Ola! Vi seu anuncio "${anuncio.titulo}" no Faz Tudo e tenho interesse.`);
-    window.open(`https://wa.me/55${tel}?text=${msg}`, "_blank");
-  }
+  const porStatus = {};
+  anuncios.forEach(a => {
+    porStatus[a.status] = (porStatus[a.status] || 0) + 1;
+  });
+  const dadosStatus = Object.entries(porStatus).map(([nome, value]) => ({ nome, value }));
 
-  if (carregando) return <div className="detalhe-root"><Navbar /><Loading /></div>;
-  if (!anuncio) return <div className="detalhe-root"><Navbar /><div className="detalhe-notfound"><p>Anuncio nao encontrado.</p></div></div>;
+  const precoMedio = anuncios.length
+    ? (anuncios.reduce((acc, a) => acc + (a.preco || 0), 0) / anuncios.length).toFixed(2)
+    : 0;
 
   return (
-    <div className="detalhe-root">
+    <div className="du-root">
       <Navbar />
-      <div className="detalhe-body">
-        <button className="detalhe-back" onClick={() => navigate("/")}>← Voltar ao mural</button>
+      <div className="du-body">
+        <button className="du-back" onClick={() => navigate("/admin")}>← Voltar ao painel</button>
 
-        <div className="detalhe-card">
-          <div className="detalhe-top">
-            <span className="detalhe-cat">Categoria #{anuncio.categoria_id}</span>
-            <span className="detalhe-preco">R$ {Number(anuncio.preco).toFixed(2)}</span>
-          </div>
-          <h1 className="detalhe-titulo">{anuncio.titulo}</h1>
-          <div className="detalhe-divider" />
-          <div className="detalhe-section">
-            <p className="detalhe-section-label">Sobre o servico</p>
-            <p className="detalhe-desc">{anuncio.descricao}</p>
-          </div>
-          <div className="detalhe-divider" />
-          <div className="detalhe-info-row">
-            <div className="info-item">
-              <p className="info-label">Preco</p>
-              <p className="info-valor">R$ {Number(anuncio.preco).toFixed(2)}</p>
-            </div>
-            <div className="info-item">
-              <p className="info-label">Status</p>
-              <p className="info-valor">{anuncio.status}</p>
-            </div>
-            <div className="info-item">
-              <p className="info-label">Prestador</p>
-              <p className="info-valor">{anuncio.prestador_nome || `#${anuncio.prestador_id}`}</p>
+        <div className="du-header">
+          <div className="du-avatar">{iniciais(usuario.nome)}</div>
+          <div className="du-info">
+            <h1 className="du-nome">{usuario.nome}</h1>
+            <p className="du-email">{usuario.email}</p>
+            <div className="du-tags">
+              <span className={`du-perfil du-perfil-${usuario.perfil}`}>{usuario.perfil}</span>
+              <span className="du-status" style={{ color: usuario.ativo ? "#1D9E75" : "#C0392B" }}>
+                {usuario.ativo ? "● Ativo" : "○ Inativo"}
+              </span>
             </div>
           </div>
         </div>
 
-        <div className="detalhe-acoes">
-          <button className="btn-editar" onClick={() => navigate(`/editar-anuncio/${anuncio.id}`)}>Editar anuncio</button>
-          <button className="btn-deletar" onClick={() => setModalRemover(true)}>Remover</button>
+        <div className="du-stats">
+          <div className="du-stat-card">
+            <span className="du-stat-num">{anuncios.length}</span>
+            <span className="du-stat-label">Anúncios postados</span>
+          </div>
+          <div className="du-stat-card">
+            <span className="du-stat-num">{Number(usuario.media_avaliacao).toFixed(1)}</span>
+            <span className="du-stat-label">Média de avaliação</span>
+          </div>
+          <div className="du-stat-card">
+            <span className="du-stat-num">R$ {precoMedio}</span>
+            <span className="du-stat-label">Preço médio</span>
+          </div>
+          <div className="du-stat-card">
+            <span className="du-stat-num">{usuario.cidade || "—"}</span>
+            <span className="du-stat-label">Cidade</span>
+          </div>
         </div>
 
-        {solicitado ? (
-          <div className="solicitado-card">
-            <span className="solicitado-icon">✓</span>
-            <div>
-              <p className="solicitado-titulo">Servico solicitado!</p>
-              <p className="solicitado-sub">Acompanhe em Meus Contratos</p>
-            </div>
-            <button className="btn-ver-contratos" onClick={() => navigate("/meus-contratos")}>Ver contratos</button>
+        {anuncios.length === 0 ? (
+          <div className="du-vazio">
+            <p>Este usuário ainda não postou nenhum anúncio.</p>
           </div>
         ) : (
-          <div className="detalhe-contato-row">
-            <button className="btn-contato" onClick={handleSolicitar} disabled={solicitando}>
-              {solicitando ? "Solicitando..." : "Solicitar servico"}
-            </button>
-            <button className="btn-whatsapp" onClick={abrirWhatsApp}>
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                <path d="M17.5 14.4c-.3-.1-1.7-.8-1.9-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.8-2.8-1.5-3.9-3.4-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.3 5.2 4.6 2 .8 2.7.9 3.7.8.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3z"/>
-                <path d="M12 2a10 10 0 00-8.5 15.2L2 22l4.9-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20z"/>
-              </svg>
-              Chamar no WhatsApp
-            </button>
+          <div className="du-graficos">
+            <div className="du-grafico-card">
+              <h3 className="du-grafico-titulo">Anúncios por categoria</h3>
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={dadosCategoria}>
+                  <XAxis dataKey="nome" tick={{ fontSize: 12, fill: "#7A5A3A" }} />
+                  <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: "#7A5A3A" }} />
+                  <Tooltip />
+                  <Bar dataKey="qtd" fill="#C45A10" radius={[8, 8, 0, 0]} name="Anúncios" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="du-grafico-card">
+              <h3 className="du-grafico-titulo">Status dos anúncios</h3>
+              <ResponsiveContainer width="100%" height={240}>
+                <PieChart>
+                  <Pie data={dadosStatus} dataKey="value" nameKey="nome"
+                    cx="50%" cy="50%" outerRadius={75} innerRadius={35}
+                    paddingAngle={2}
+                    label={({ value }) => value}
+                    labelLine={false}>
+                    {dadosStatus.map((_, i) => (
+                      <Cell key={i} fill={CORES[i % CORES.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         )}
 
-        <div className="detalhe-section">
-          <p className="detalhe-section-label">Avaliacoes</p>
-          <ListaAvaliacoes avaliacoes={avaliacoes} />
-        </div>
+        {anuncios.length > 0 && (
+          <div className="du-anuncios">
+            <h3 className="du-grafico-titulo">Anúncios deste usuário</h3>
+            {anuncios.map(a => (
+              <div key={a.id} className="du-anuncio-item" onClick={() => navigate(`/anuncio/${a.id}`)}>
+                <span className="du-anuncio-titulo">{a.titulo}</span>
+                <span className="du-anuncio-preco">R$ {Number(a.preco).toFixed(2)}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-
-      <Modal
-        aberto={modalRemover}
-        titulo="Remover anuncio"
-        mensagem="Tem certeza que deseja remover este anuncio? Esta acao nao pode ser desfeita."
-        textoConfirmar="Sim, remover"
-        perigo
-        onConfirmar={handleDeletar}
-        onCancelar={() => setModalRemover(false)}
-      />
     </div>
   );
 }

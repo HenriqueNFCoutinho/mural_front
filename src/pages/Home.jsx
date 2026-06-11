@@ -1,20 +1,10 @@
 import { useState, useEffect } from "react";
 import { listarAnuncios, listarCategorias } from "../services/api";
+import { useDebounce } from "../components/useDebounce";
 import Navbar from "../components/Navbar";
 import CardAnuncio from "../components/CardAnuncio";
 import { SkeletonGrid } from "../components/Skeleton";
 import "./Home.css";
-
-const ANUNCIOS_MOCK = [
-  { id: 1, prestador_id: 2, categoria_id: 1, titulo: "Monitoria de Calculo I", descricao: "Ajudo com limites, derivadas e integrais. Aulas presenciais ou online.", preco: 35, status: "ativo", media_avaliacao: 4.8 },
-  { id: 2, prestador_id: 3, categoria_id: 2, titulo: "Reparos eletricos residenciais", descricao: "Tomadas, chuveiros, disjuntores. Atendimento rapido na sua casa.", preco: 80, status: "ativo", media_avaliacao: 4.9 },
-  { id: 3, prestador_id: 4, categoria_id: 3, titulo: "Criacao de sites e landing pages", descricao: "Desenvolvo sites modernos e responsivos para o seu negocio.", preco: 350, status: "ativo", media_avaliacao: 5.0 },
-  { id: 4, prestador_id: 5, categoria_id: 4, titulo: "Design de logotipo", descricao: "Identidade visual completa para sua marca.", preco: 150, status: "ativo", media_avaliacao: 4.7 },
-  { id: 5, prestador_id: 2, categoria_id: 5, titulo: "Entregas rapidas de moto", descricao: "Faco entregas na cidade toda. Rapido e seguro.", preco: 20, status: "ativo", media_avaliacao: 4.6 },
-  { id: 6, prestador_id: 3, categoria_id: 6, titulo: "Jardinagem e poda", descricao: "Deixo seu jardim impecavel. Poda, plantio e manutencao.", preco: 60, status: "ativo", media_avaliacao: 4.8 },
-  { id: 7, prestador_id: 4, categoria_id: 1, titulo: "Aulas de ingles particular", descricao: "Conversacao e gramatica para todos os niveis.", preco: 45, status: "ativo", media_avaliacao: 4.9 },
-  { id: 8, prestador_id: 5, categoria_id: 3, titulo: "Manutencao de computadores", descricao: "Formatacao, limpeza e upgrade de pecas.", preco: 70, status: "ativo", media_avaliacao: 4.5 },
-];
 
 const ORDENACOES = [
   { value: "recentes", label: "Mais recentes" },
@@ -27,14 +17,15 @@ export default function Home() {
   const [anuncios, setAnuncios] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [busca, setBusca] = useState("");
+  const buscaDebounced = useDebounce(busca, 400);
   const [catAtiva, setCatAtiva] = useState(null);
   const [ordem, setOrdem] = useState("recentes");
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
     listarAnuncios()
-      .then(data => setAnuncios(Array.isArray(data) && data.length ? data : ANUNCIOS_MOCK))
-      .catch(() => setAnuncios(ANUNCIOS_MOCK))
+      .then(data => setAnuncios(Array.isArray(data) ? data : []))
+      .catch(() => setAnuncios([]))
       .finally(() => setCarregando(false));
 
     listarCategorias()
@@ -43,8 +34,9 @@ export default function Home() {
   }, []);
 
   let filtrados = anuncios.filter(a => {
-    const matchBusca = a.titulo?.toLowerCase().includes(busca.toLowerCase()) ||
-                       a.descricao?.toLowerCase().includes(busca.toLowerCase());
+    const termo = buscaDebounced.toLowerCase();
+    const matchBusca = a.titulo?.toLowerCase().includes(termo) ||
+                       a.descricao?.toLowerCase().includes(termo);
     const matchCat = catAtiva === null || a.categoria_id === catAtiva;
     return matchBusca && matchCat;
   });
@@ -93,7 +85,7 @@ export default function Home() {
         ) : filtrados.length === 0 ? (
           <div className="empty-state">
             <p className="empty-title">Nenhum anuncio encontrado</p>
-            <p className="empty-sub">Tente outra busca ou categoria</p>
+            <p className="empty-sub">Tente outra busca ou seja o primeiro a anunciar!</p>
           </div>
         ) : (
           <>

@@ -1,28 +1,43 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registrar } from "../services/api";
+import { validarEmail, validarSenha, validarNome } from "../services/validacao";
 import "./Auth.css";
 
 export default function Register() {
-  const [form, setForm] = useState({ nome: "", email: "", senha: "", bairro: "", cidade: "" });
-  const [erro, setErro] = useState("");
+  const [form, setForm] = useState({ nome: "", email: "", senha: "", telefone: "", bairro: "", cidade: "" });
+  const [erros, setErros] = useState({});
+  const [erroGeral, setErroGeral] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    setErro("");
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    setErros({ ...erros, [name]: "" });
+    setErroGeral("");
+  }
+
+  function validar() {
+    const novosErros = {
+      nome: validarNome(form.nome),
+      email: validarEmail(form.email),
+      senha: validarSenha(form.senha),
+    };
+    setErros(novosErros);
+    return !novosErros.nome && !novosErros.email && !novosErros.senha;
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (!validar()) return;
     setLoading(true);
-    setErro("");
+    setErroGeral("");
     try {
       await registrar({ ...form, perfil: "user" });
       navigate("/login");
     } catch (err) {
-      setErro(err?.erro || "Erro ao cadastrar. Tente novamente.");
+      setErroGeral(err?.erro || "Erro ao cadastrar. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -34,17 +49,26 @@ export default function Register() {
         <div className="auth-logo"><span className="logo-text">Faz Tudo</span></div>
         <p className="auth-tagline">Crie sua conta gratuitamente</p>
         <h1 className="auth-title">Cadastrar</h1>
-        {erro && <div className="auth-erro">{erro}</div>}
-        <form className="auth-form" onSubmit={handleSubmit}>
+        {erroGeral && <div className="auth-erro">{erroGeral}</div>}
+        <form className="auth-form" onSubmit={handleSubmit} noValidate>
           <div className="field">
             <label>Nome completo</label>
             <input type="text" name="nome" placeholder="Seu nome"
-              value={form.nome} onChange={handleChange} required />
+              className={erros.nome ? "input-erro" : ""}
+              value={form.nome} onChange={handleChange} />
+            {erros.nome && <span className="campo-erro">{erros.nome}</span>}
           </div>
           <div className="field">
             <label>E-mail</label>
             <input type="email" name="email" placeholder="seu@email.com"
-              value={form.email} onChange={handleChange} required />
+              className={erros.email ? "input-erro" : ""}
+              value={form.email} onChange={handleChange} />
+            {erros.email && <span className="campo-erro">{erros.email}</span>}
+          </div>
+          <div className="field">
+            <label>Telefone / WhatsApp</label>
+            <input type="tel" name="telefone" placeholder="(83) 99999-9999"
+              value={form.telefone} onChange={handleChange} />
           </div>
           <div className="field-row">
             <div className="field">
@@ -60,14 +84,16 @@ export default function Register() {
           </div>
           <div className="field">
             <label>Senha</label>
-            <input type="password" name="senha" placeholder="Mínimo 8 caracteres"
-              value={form.senha} onChange={handleChange} required minLength={8} />
+            <input type="password" name="senha" placeholder="Minimo 8 caracteres"
+              className={erros.senha ? "input-erro" : ""}
+              value={form.senha} onChange={handleChange} />
+            {erros.senha && <span className="campo-erro">{erros.senha}</span>}
           </div>
           <button className="btn-submit" type="submit" disabled={loading}>
             {loading ? <span className="spinner" /> : "Criar conta"}
           </button>
         </form>
-        <p className="auth-switch">Já tem conta? <Link to="/login">Entrar</Link></p>
+        <p className="auth-switch">Ja tem conta? <Link to="/login">Entrar</Link></p>
       </div>
     </div>
   );

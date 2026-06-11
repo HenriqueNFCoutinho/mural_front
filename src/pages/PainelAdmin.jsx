@@ -10,13 +10,6 @@ import Loading from "../components/Loading";
 import "./PainelAdmin.css";
 
 
-const USUARIOS_MOCK = [
-  { id: 1, nome: "Henrique Coutinho", email: "henrique@email.com", perfil: "admin", ativo: true, cidade: "Cajazeiras", media_avaliacao: 4.8 },
-  { id: 2, nome: "Rafael Batista", email: "rafael@email.com", perfil: "user", ativo: true, cidade: "Cajazeiras", media_avaliacao: 4.9 },
-  { id: 3, nome: "Ana Melo", email: "ana@email.com", perfil: "user", ativo: true, cidade: "Sousa", media_avaliacao: 5.0 },
-  { id: 4, nome: "Jonas Silva", email: "jonas@email.com", perfil: "user", ativo: false, cidade: "Cajazeiras", media_avaliacao: 4.7 },
-  { id: 5, nome: "Larissa Pereira", email: "larissa@email.com", perfil: "user", ativo: true, cidade: "Pombal", media_avaliacao: 4.8 },
-];
 
 function iniciais(nome) {
   if (!nome) return "?";
@@ -40,12 +33,12 @@ export default function PainelAdmin() {
     const promise = filtro === "todos" ? listarUsuarios() : filtrarPorPerfil(filtro);
     promise
       .then(data => setUsuarios(Array.isArray(data) ? data : []))
-      .catch(() => setUsuarios(USUARIOS_MOCK))
+      .catch(() => setErro("Nao foi possivel carregar os usuarios. Verifique se voce e admin."))
       .finally(() => setCarregando(false));
   }
 
   useEffect(() => {
-    // if (!estaLogado()) { navigate("/login"); return; }  // desativado para testar com mock
+    if (!estaLogado()) { navigate("/login"); return; }
     carregar();
   }, [filtro]);
 
