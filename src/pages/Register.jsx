@@ -34,7 +34,8 @@ export default function Register() {
     setLoading(true);
     setErroGeral("");
     try {
-      await registrar({ ...form, perfil: "user" });
+      const numeroLimpo = form.numero.replace(/\D/g, "");
+      await registrar({ ...form, numero: numeroLimpo, perfil: "user" });
       navigate("/login");
     } catch (err) {
       setErroGeral(err?.erro || "Erro ao cadastrar. Tente novamente.");

@@ -29,7 +29,7 @@ export default function PainelAdmin() {
   const [editando, setEditando] = useState(null);
   const [formEdit, setFormEdit] = useState({ nome: "", email: "" });
   const [mostrarCriar, setMostrarCriar] = useState(false);
-  const [formNovo, setFormNovo] = useState({ nome: "", email: "", senha: "", perfil: "user", bairro: "", cidade: "" });
+  const [formNovo, setFormNovo] = useState({ nome: "", email: "", senha: "", numero: "", perfil: "user", bairro: "", cidade: "" });
   const navigate = useNavigate();
 
   function carregar() {
@@ -86,10 +86,11 @@ export default function PainelAdmin() {
   async function handleCriar(e) {
     e.preventDefault();
     try {
-      const novo = await criarUsuarioAdm(formNovo);
+      const numeroLimpo = formNovo.numero.replace(/\D/g, "");
+      const novo = await criarUsuarioAdm({ ...formNovo, numero: numeroLimpo });
       setUsuarios([...usuarios, novo]);
       setMostrarCriar(false);
-      setFormNovo({ nome: "", email: "", senha: "", perfil: "user", bairro: "", cidade: "" });
+      setFormNovo({ nome: "", email: "", senha: "", numero: "", perfil: "user", bairro: "", cidade: "" });
     } catch (err) { toast(err?.erro || "Erro ao criar usuário.", "erro"); }
   }
 
@@ -142,6 +143,8 @@ export default function PainelAdmin() {
               onChange={e => setFormNovo({ ...formNovo, email: e.target.value })} />
             <input placeholder="Senha" type="password" value={formNovo.senha} required
               onChange={e => setFormNovo({ ...formNovo, senha: e.target.value })} />
+            <input placeholder="Telefone (obrigatório)" type="tel" value={formNovo.numero} required
+              onChange={e => setFormNovo({ ...formNovo, numero: e.target.value })} />
             <select value={formNovo.perfil} onChange={e => setFormNovo({ ...formNovo, perfil: e.target.value })}>
               <option value="user">Usuário</option>
               <option value="admin">Admin</option>
