@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { listarContratos, atualizarContrato, criarAvaliacao, estaLogado } from "../services/api";
+import { listarContratos, atualizarContrato, criarAvaliacao, avaliacaoDoContrato, estaLogado } from "../services/api";
 import Navbar from "../components/Navbar";
 import Loading from "../components/Loading";
 import Modal from "../components/Modal";
@@ -54,7 +54,21 @@ export default function MeusContratos() {
   useEffect(() => {
     if (!estaLogado()) { navigate("/login"); return; }
     listarContratos()
-      .then(data => setContratos(Array.isArray(data) ? data : []))
+      .then(async (data) => {
+        const lista = Array.isArray(data) ? data : [];
+        const comAvaliacoes = await Promise.all(
+          lista.map(async (c) => {
+            if (c.status === "concluido") {
+              try {
+                const av = await avaliacaoDoContrato(c.id);
+                if (av) return { ...c, avaliado: true, avaliacao: av };
+              } catch {}
+            }
+            return c;
+          })
+        );
+        setContratos(comAvaliacoes);
+      })
       .catch(() => setContratos([]))
       .finally(() => setCarregando(false));
   }, []);

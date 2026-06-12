@@ -67,9 +67,9 @@ export const listarContratos   = ()            => request("GET",   "/contratos")
 export const buscarContrato    = (id)          => request("GET",   `/contratos/${id}`);
 export const atualizarContrato = (id, status)  => request("PATCH", `/contratos/${id}/status`, { status });
 
-export const criarAvaliacao      = (dados)      => request("POST", "/avaliacoes", dados);
-export const listarAvaliacoes    = (anuncioId)  => request("GET",  `/anuncios/${anuncioId}/avaliacoes`);
-export const avaliacaoDoContrato = (contratoId) => request("GET",  `/contratos/${contratoId}/avaliacao`);
+export const criarAvaliacao      = (dados)      => request("POST", "/avaliacao", dados);
+export const listarAvaliacoes    = (_anuncioId) => request("GET",  "/avaliacao");
+export const avaliacaoDoContrato = (contratoId) => request("GET",  "/avaliacao").then(lista => (Array.isArray(lista) ? lista : []).find(a => a.contrato_id === Number(contratoId)) || null);
 
 export const listarUsuarios    = ()           => request("GET",    "/adm");
 export const buscarUsuario     = (id)         => request("GET",    `/adm/${id}`);

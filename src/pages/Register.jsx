@@ -5,7 +5,7 @@ import { validarEmail, validarSenha, validarNome } from "../services/validacao";
 import "./Auth.css";
 
 export default function Register() {
-  const [form, setForm] = useState({ nome: "", email: "", senha: "", telefone: "", bairro: "", cidade: "" });
+  const [form, setForm] = useState({ nome: "", email: "", senha: "", numero: "", bairro: "", cidade: "" });
   const [erros, setErros] = useState({});
   const [erroGeral, setErroGeral] = useState("");
   const [loading, setLoading] = useState(false);
@@ -67,8 +67,8 @@ export default function Register() {
           </div>
           <div className="field">
             <label>Telefone / WhatsApp</label>
-            <input type="tel" name="telefone" placeholder="(83) 99999-9999"
-              value={form.telefone} onChange={handleChange} />
+            <input type="tel" name="numero" placeholder="(83) 99999-9999"
+              value={form.numero} onChange={handleChange} />
           </div>
           <div className="field-row">
             <div className="field">
