@@ -16,8 +16,3 @@ export function validarNome(nome) {
   if (!nome || nome.trim().length < 2) return "Digite seu nome completo.";
   return "";
 }
-
-export function validarObrigatorio(valor, campo = "Este campo") {
-  if (!valor || !String(valor).trim()) return `${campo} é obrigatório.`;
-  return "";
-}

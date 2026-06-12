@@ -20,6 +20,7 @@ function iniciais(nome) {
 }
 
 export default function PainelAdmin() {
+  const toast = useToast();
   const [aba, setAba] = useState("usuarios");
   const [usuarios, setUsuarios] = useState([]);
   const [carregando, setCarregando] = useState(true);
