@@ -79,4 +79,3 @@ export const deletarUsuario    = (id)         => request("DELETE", `/adm/${id}`)
 export const filtrarPorPerfil  = (perfil)     => request("GET",    `/adm/filtro-perfil?perfil=${perfil}`);
 export const alternarStatus    = (id, ativo)  => request("PATCH",  `/adm/${id}/status`, { ativo });
 export const alterarPerfil     = (id, perfil) => request("PATCH",  `/adm/${id}/perfil`, { perfil });
-export const deletarMinhaConta = ()           => request("DELETE", "/adm/me");

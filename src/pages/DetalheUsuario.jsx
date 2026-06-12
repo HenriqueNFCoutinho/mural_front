@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { buscarUsuario, listarAnuncios, estaLogado } from "../services/api";
+import { buscarUsuario, listarAnuncios, estaLogado, ehAdmin } from "../services/api";
 import Navbar from "../components/Navbar";
 import Loading from "../components/Loading";
 import {
@@ -27,6 +27,7 @@ export default function DetalheUsuario() {
 
   useEffect(() => {
     if (!estaLogado()) { navigate("/login"); return; }
+    if (!ehAdmin()) { navigate("/"); return; }
     Promise.all([buscarUsuario(id), listarAnuncios()])
       .then(([user, todosAnuncios]) => {
         setUsuario(user);

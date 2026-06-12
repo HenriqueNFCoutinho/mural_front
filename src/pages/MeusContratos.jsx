@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { listarContratos, atualizarContrato, criarAvaliacao, avaliacaoDoContrato, estaLogado } from "../services/api";
+import { listarContratos, atualizarContrato, criarAvaliacao, listarAvaliacoes as listarTodasAvaliacoes, estaLogado } from "../services/api";
 import Navbar from "../components/Navbar";
 import Loading from "../components/Loading";
 import Modal from "../components/Modal";
@@ -53,20 +53,17 @@ export default function MeusContratos() {
 
   useEffect(() => {
     if (!estaLogado()) { navigate("/login"); return; }
-    listarContratos()
-      .then(async (data) => {
+    Promise.all([listarContratos(), listarTodasAvaliacoes()])
+      .then(([data, todasAvs]) => {
         const lista = Array.isArray(data) ? data : [];
-        const comAvaliacoes = await Promise.all(
-          lista.map(async (c) => {
-            if (c.status === "concluido") {
-              try {
-                const av = await avaliacaoDoContrato(c.id);
-                if (av) return { ...c, avaliado: true, avaliacao: av };
-              } catch {}
-            }
-            return c;
-          })
-        );
+        const avs = Array.isArray(todasAvs) ? todasAvs : [];
+        const comAvaliacoes = lista.map((c) => {
+          if (c.status === "concluido") {
+            const av = avs.find(a => a.contrato_id === c.id);
+            if (av) return { ...c, avaliado: true, avaliacao: av };
+          }
+          return c;
+        });
         setContratos(comAvaliacoes);
       })
       .catch(() => setContratos([]))
@@ -76,9 +73,11 @@ export default function MeusContratos() {
   async function handleCancelar(id) {
     try {
       await atualizarContrato(id, "cancelado");
-    } catch {}
-    setContratos(contratos.map(c => c.id === id ? { ...c, status: "cancelado" } : c));
-    toast("Contrato cancelado.", "info");
+      setContratos(contratos.map(c => c.id === id ? { ...c, status: "cancelado" } : c));
+      toast("Contrato cancelado.", "info");
+    } catch (err) {
+      toast(err?.erro || "Erro ao cancelar contrato. Tente novamente.", "erro");
+    }
     setModalCancelar(null);
   }
 
@@ -87,12 +86,14 @@ export default function MeusContratos() {
     const avaliacao = { nota, comentario };
     try {
       await criarAvaliacao({ contrato_id: contratoId, nota, comentario });
-    } catch {}
-    toast("Avaliacao enviada!", "sucesso");
-    setContratos(contratos.map(c => c.id === contratoId ? { ...c, avaliado: true, avaliacao } : c));
-    setAvaliando(null);
-    setNota(0);
-    setComentario("");
+      toast("Avaliação enviada!", "sucesso");
+      setContratos(contratos.map(c => c.id === contratoId ? { ...c, avaliado: true, avaliacao } : c));
+      setAvaliando(null);
+      setNota(0);
+      setComentario("");
+    } catch (err) {
+      toast(err?.erro || "Erro ao enviar avaliação. Tente novamente.", "erro");
+    }
   }
 
   const ativos = contratos.filter(c => ["pendente", "ativo"].includes(c.status));

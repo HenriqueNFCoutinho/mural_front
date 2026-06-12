@@ -4,20 +4,11 @@ import Loading from "./Loading";
 import Modal from "./Modal";
 import { useToast } from "./Toast";
 
-const CATEGORIAS_MOCK = [
-  { id: 1, nome: "Monitoria" },
-  { id: 2, nome: "Reparos" },
-  { id: 3, nome: "Tecnologia" },
-  { id: 4, nome: "Arte & Design" },
-  { id: 5, nome: "Entregas" },
-  { id: 6, nome: "Jardinagem" },
-];
-
 export default function GerenciarCategorias() {
   const toast = useToast();
   const [categorias, setCategorias] = useState([]);
   const [carregando, setCarregando] = useState(true);
-  const [usandoMock, setUsandoMock] = useState(false);
+  const [erro, setErro] = useState("");
   const [novoNome, setNovoNome] = useState("");
   const [confirmarCriar, setConfirmarCriar] = useState(false);
   const [editando, setEditando] = useState(null);
@@ -26,9 +17,10 @@ export default function GerenciarCategorias() {
 
   function carregar() {
     setCarregando(true);
+    setErro("");
     listarCategorias()
       .then(data => setCategorias(Array.isArray(data) ? data : []))
-      .catch(() => { setCategorias(CATEGORIAS_MOCK); setUsandoMock(true); })
+      .catch(() => setErro("Não foi possível carregar as categorias. Verifique se o servidor está rodando."))
       .finally(() => setCarregando(false));
   }
 
@@ -42,14 +34,6 @@ export default function GerenciarCategorias() {
 
   async function handleCriar() {
     if (!novoNome.trim()) return;
-    if (usandoMock) {
-      const novoId = Math.max(0, ...categorias.map(c => c.id)) + 1;
-      setCategorias([...categorias, { id: novoId, nome: novoNome.trim() }]);
-      setNovoNome("");
-      setConfirmarCriar(false);
-      toast("Categoria criada! (mock)", "sucesso");
-      return;
-    }
     try {
       const nova = await criarCategoria({ nome: novoNome.trim() });
       setCategorias([...categorias, nova]);
@@ -63,12 +47,6 @@ export default function GerenciarCategorias() {
 
   async function handleSalvar(id) {
     if (!nomeEdit.trim()) return;
-    if (usandoMock) {
-      setCategorias(categorias.map(c => c.id === id ? { ...c, nome: nomeEdit.trim() } : c));
-      setEditando(null);
-      toast("Categoria atualizada! (mock)", "sucesso");
-      return;
-    }
     try {
       const atualizada = await atualizarCategoria(id, { nome: nomeEdit.trim() });
       setCategorias(categorias.map(c => c.id === id ? { ...c, ...atualizada } : c));
@@ -80,12 +58,6 @@ export default function GerenciarCategorias() {
   }
 
   async function handleDeletar(id) {
-    if (usandoMock) {
-      setCategorias(categorias.filter(c => c.id !== id));
-      toast("Categoria removida. (mock)", "info");
-      setModalDeletar(null);
-      return;
-    }
     try {
       await deletarCategoria(id);
       setCategorias(categorias.filter(c => c.id !== id));
@@ -97,6 +69,13 @@ export default function GerenciarCategorias() {
   }
 
   if (carregando) return <Loading texto="Carregando categorias..." />;
+
+  if (erro) return (
+    <div style={{ padding: "24px", textAlign: "center" }}>
+      <p style={{ color: "#C0392B", marginBottom: 12 }}>{erro}</p>
+      <button onClick={carregar} style={{ padding: "8px 20px", borderRadius: 8, background: "#C45A10", color: "#fff", border: "none", cursor: "pointer" }}>Tentar novamente</button>
+    </div>
+  );
 
   return (
     <div className="cat-admin">
