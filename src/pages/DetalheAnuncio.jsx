@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   buscarAnuncio, buscarUsuario, buscarCategoria, criarContrato,
-  deletarAnuncio, listarAvaliacoes, estaLogado, meuId
+  deletarAnuncio, listarAvaliacoes, listarContratos, estaLogado, meuId
 } from "../services/api";
 import Navbar from "../components/Navbar";
 import Loading from "../components/Loading";
@@ -16,7 +16,6 @@ function iniciais(nome) {
   return nome.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
 }
 
-const LABELS_NOTA = ["", "Ruim", "Regular", "Bom", "Ótimo", "Excelente"];
 
 export default function DetalheAnuncio() {
   const { id } = useParams();
@@ -44,6 +43,14 @@ export default function DetalheAnuncio() {
           const u = await buscarUsuario(a.prestador_id);
           setPrestador(u);
         } catch {}
+        if (estaLogado()) {
+          try {
+            const contratos = await listarContratos();
+            const jaContratado = (Array.isArray(contratos) ? contratos : [])
+              .some(ct => ct.anuncio_id === a.id && ct.status !== "cancelado");
+            if (jaContratado) setSolicitado(true);
+          } catch {}
+        }
         try {
           const cat = await buscarCategoria(a.categoria_id);
           setCategoria(cat);

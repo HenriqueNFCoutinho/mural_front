@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   listarUsuarios, deletarUsuario, alternarStatus,
   alterarPerfil, atualizarUsuario, filtrarPorPerfil,
-  criarUsuarioAdm, estaLogado
+  criarUsuarioAdm, estaLogado, ehAdmin
 } from "../services/api";
 import Navbar from "../components/Navbar";
 import Loading from "../components/Loading";
@@ -23,7 +23,6 @@ export default function PainelAdmin() {
   const [aba, setAba] = useState("usuarios");
   const [usuarios, setUsuarios] = useState([]);
   const [carregando, setCarregando] = useState(true);
-  const [erro, setErro] = useState("");
   const [filtro, setFiltro] = useState("todos");
   const [confirmando, setConfirmando] = useState(null);
   const [editando, setEditando] = useState(null);
@@ -37,12 +36,13 @@ export default function PainelAdmin() {
     const promise = filtro === "todos" ? listarUsuarios() : filtrarPorPerfil(filtro);
     promise
       .then(data => setUsuarios(Array.isArray(data) ? data : []))
-      .catch(() => setErro("Nao foi possivel carregar os usuarios. Verifique se voce e admin."))
+      .catch(() => toast("Não foi possível carregar os usuários.", "erro"))
       .finally(() => setCarregando(false));
   }
 
   useEffect(() => {
     if (!estaLogado()) { navigate("/login"); return; }
+    if (!ehAdmin()) { navigate("/"); return; }
     carregar();
   }, [filtro]);
 
@@ -51,14 +51,14 @@ export default function PainelAdmin() {
       await deletarUsuario(id);
       setUsuarios(usuarios.filter(u => u.id !== id));
       setConfirmando(null);
-    } catch { setErro("Erro ao deletar usuário."); }
+    } catch { toast("Erro ao deletar usuário.", "erro"); }
   }
 
   async function handleStatus(id, ativoAtual) {
     try {
       const atualizado = await alternarStatus(id, !ativoAtual);
       setUsuarios(usuarios.map(u => u.id === id ? { ...u, ativo: atualizado.ativo } : u));
-    } catch { setErro("Erro ao alterar status."); }
+    } catch { toast("Erro ao alterar status.", "erro"); }
   }
 
   async function handlePerfil(id, perfilAtual) {
@@ -66,7 +66,7 @@ export default function PainelAdmin() {
     try {
       const atualizado = await alterarPerfil(id, novo);
       setUsuarios(usuarios.map(u => u.id === id ? { ...u, perfil: atualizado.perfil } : u));
-    } catch { setErro("Erro ao alterar perfil."); }
+    } catch { toast("Erro ao alterar perfil.", "erro"); }
   }
 
   function abrirEdicao(u) {
@@ -79,7 +79,7 @@ export default function PainelAdmin() {
       const atualizado = await atualizarUsuario(id, formEdit);
       setUsuarios(usuarios.map(u => u.id === id ? { ...u, ...atualizado } : u));
       setEditando(null);
-    } catch { setErro("Erro ao salvar edição."); }
+    } catch { toast("Erro ao salvar edição.", "erro"); }
   }
 
   async function handleCriar(e) {
@@ -89,7 +89,7 @@ export default function PainelAdmin() {
       setUsuarios([...usuarios, novo]);
       setMostrarCriar(false);
       setFormNovo({ nome: "", email: "", senha: "", perfil: "user", bairro: "", cidade: "" });
-    } catch (err) { setErro(err?.erro || "Erro ao criar usuário."); }
+    } catch (err) { toast(err?.erro || "Erro ao criar usuário.", "erro"); }
   }
 
   return (
@@ -149,7 +149,6 @@ export default function PainelAdmin() {
           </form>
         )}
 
-        {erro && <div className="admin-erro-banner">{erro}</div>}
 
         {carregando ? (
           <Loading texto="Carregando usuários..." />

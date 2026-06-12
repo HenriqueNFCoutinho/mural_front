@@ -38,7 +38,8 @@ export default function Home() {
     const matchBusca = a.titulo?.toLowerCase().includes(termo) ||
                        a.descricao?.toLowerCase().includes(termo);
     const matchCat = catAtiva === null || a.categoria_id === catAtiva;
-    return matchBusca && matchCat;
+    const ativo = !a.status || a.status === "ativo";
+    return matchBusca && matchCat && ativo;
   });
 
   filtrados = [...filtrados].sort((a, b) => {

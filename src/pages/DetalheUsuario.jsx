@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { buscarUsuario, listarAnuncios, estaLogado, ehAdmin } from "../services/api";
+import { buscarUsuario, listarAnuncios, listarCategorias, estaLogado, ehAdmin } from "../services/api";
 import Navbar from "../components/Navbar";
 import Loading from "../components/Loading";
 import {
@@ -23,17 +23,19 @@ export default function DetalheUsuario() {
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
   const [anuncios, setAnuncios] = useState([]);
+  const [categorias, setCategorias] = useState([]);
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
     if (!estaLogado()) { navigate("/login"); return; }
     if (!ehAdmin()) { navigate("/"); return; }
-    Promise.all([buscarUsuario(id), listarAnuncios()])
-      .then(([user, todosAnuncios]) => {
+    Promise.all([buscarUsuario(id), listarAnuncios(), listarCategorias()])
+      .then(([user, todosAnuncios, cats]) => {
         setUsuario(user);
         const doUsuario = (Array.isArray(todosAnuncios) ? todosAnuncios : [])
           .filter(a => a.prestador_id === Number(id));
         setAnuncios(doUsuario);
+        setCategorias(Array.isArray(cats) ? cats : []);
       })
       .catch(() => navigate("/admin"))
       .finally(() => setCarregando(false));
@@ -44,8 +46,9 @@ export default function DetalheUsuario() {
 
   const porCategoria = {};
   anuncios.forEach(a => {
-    const cat = `Cat. ${a.categoria_id}`;
-    porCategoria[cat] = (porCategoria[cat] || 0) + 1;
+    const cat = categorias.find(c => c.id === a.categoria_id);
+    const nome = cat?.nome || `Cat. ${a.categoria_id}`;
+    porCategoria[nome] = (porCategoria[nome] || 0) + 1;
   });
   const dadosCategoria = Object.entries(porCategoria).map(([nome, qtd]) => ({ nome, qtd }));
 

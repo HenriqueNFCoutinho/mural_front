@@ -1,15 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { criarAnuncio, listarCategorias } from "../services/api";
+import { criarAnuncio, listarCategorias, estaLogado } from "../services/api";
 import "./CriarAnuncio.css";
-
-const TIPOS_PRECO = [
-  { value: "hora", label: "por hora" },
-  { value: "projeto", label: "por projeto" },
-  { value: "visita", label: "por visita" },
-  { value: "entrega", label: "por entrega" },
-  { value: "combinado", label: "a combinar" },
-];
 
 export default function CriarAnuncio() {
   const navigate = useNavigate();
@@ -17,10 +9,11 @@ export default function CriarAnuncio() {
   const [erro, setErro] = useState("");
   const [categorias, setCategorias] = useState([]);
   const [form, setForm] = useState({
-    categoria_id: "", titulo: "", descricao: "", preco: "", tipo_preco: "hora",
+    categoria_id: "", titulo: "", descricao: "", preco: "",
   });
 
   useEffect(() => {
+    if (!estaLogado()) { navigate("/login"); return; }
     listarCategorias()
       .then(data => setCategorias(Array.isArray(data) ? data : []))
       .catch(() => setCategorias([]));
@@ -114,9 +107,6 @@ export default function CriarAnuncio() {
                 <input type="number" name="preco" placeholder="0,00"
                   value={form.preco} onChange={handleChange} min="0" step="0.01" required />
               </div>
-              <select name="tipo_preco" value={form.tipo_preco} onChange={handleChange}>
-                {TIPOS_PRECO.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-              </select>
             </div>
           </div>
 

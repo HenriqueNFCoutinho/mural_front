@@ -1,15 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { buscarAnuncio, atualizarAnuncio, listarCategorias } from "../services/api";
+import { buscarAnuncio, atualizarAnuncio, listarCategorias, estaLogado } from "../services/api";
 import "./CriarAnuncio.css";
-
-const TIPOS_PRECO = [
-  { value: "hora", label: "por hora" },
-  { value: "projeto", label: "por projeto" },
-  { value: "visita", label: "por visita" },
-  { value: "entrega", label: "por entrega" },
-  { value: "combinado", label: "a combinar" },
-];
 
 export default function EditarAnuncio() {
   const { id } = useParams();
@@ -19,10 +11,11 @@ export default function EditarAnuncio() {
   const [erro, setErro] = useState("");
   const [categorias, setCategorias] = useState([]);
   const [form, setForm] = useState({
-    categoria_id: "", titulo: "", descricao: "", preco: "", tipo_preco: "hora",
+    categoria_id: "", titulo: "", descricao: "", preco: "",
   });
 
   useEffect(() => {
+    if (!estaLogado()) { navigate("/login"); return; }
     Promise.all([buscarAnuncio(id), listarCategorias()])
       .then(([anuncio, cats]) => {
         setForm({
@@ -30,7 +23,6 @@ export default function EditarAnuncio() {
           titulo: anuncio.titulo,
           descricao: anuncio.descricao,
           preco: anuncio.preco,
-          tipo_preco: "hora",
         });
         setCategorias(Array.isArray(cats) ? cats : []);
       })
@@ -48,6 +40,7 @@ export default function EditarAnuncio() {
     setErro("");
     try {
       await atualizarAnuncio(id, {
+        categoria_id: Number(form.categoria_id),
         titulo: form.titulo,
         descricao: form.descricao,
         preco: parseFloat(form.preco),
@@ -129,9 +122,6 @@ export default function EditarAnuncio() {
                 <input type="number" name="preco" placeholder="0,00" value={form.preco}
                   onChange={handleChange} min="0" step="0.01" required />
               </div>
-              <select name="tipo_preco" value={form.tipo_preco} onChange={handleChange}>
-                {TIPOS_PRECO.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-              </select>
             </div>
           </div>
 
