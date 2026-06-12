@@ -7,6 +7,9 @@ import {
 } from "../services/api";
 import Navbar from "../components/Navbar";
 import Loading from "../components/Loading";
+import Modal from "../components/Modal";
+import { useToast } from "../components/Toast";
+import GerenciarCategorias from "../components/GerenciarCategorias";
 import "./PainelAdmin.css";
 
 
@@ -17,6 +20,7 @@ function iniciais(nome) {
 }
 
 export default function PainelAdmin() {
+  const [aba, setAba] = useState("usuarios");
   const [usuarios, setUsuarios] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
@@ -95,14 +99,25 @@ export default function PainelAdmin() {
         <div className="admin-header">
           <div>
             <h1 className="admin-title">Painel de controle</h1>
-            <p className="admin-sub">Gerencie os usuários da plataforma</p>
+            <p className="admin-sub">Gerencie a plataforma</p>
           </div>
           <div className="admin-stat">
-            <span className="stat-num">{usuarios.length}</span>
-            <span className="stat-label">usuários</span>
+            <span className="stat-num">{aba === "usuarios" ? usuarios.length : ""}</span>
+            <span className="stat-label">{aba === "usuarios" ? "usuários" : "categorias"}</span>
           </div>
         </div>
 
+        <div className="admin-abas">
+          <button className={`aba-btn${aba === "usuarios" ? " ativo" : ""}`}
+            onClick={() => setAba("usuarios")}>Usuários</button>
+          <button className={`aba-btn${aba === "categorias" ? " ativo" : ""}`}
+            onClick={() => setAba("categorias")}>Categorias</button>
+        </div>
+
+        {aba === "categorias" ? (
+          <GerenciarCategorias />
+        ) : (
+        <>
         <div className="admin-toolbar">
           <div className="admin-filtros">
             {["todos", "user", "admin"].map(f => (
@@ -196,6 +211,8 @@ export default function PainelAdmin() {
               </div>
             ))}
           </div>
+        )}
+        </>
         )}
       </div>
     </div>
