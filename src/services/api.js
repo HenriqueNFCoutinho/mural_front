@@ -18,7 +18,8 @@ function idDoToken() {
   if (!token) return null;
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload.sub || payload.identity || null;
+    const id = payload.sub ?? payload.identity ?? null;
+    return id !== null ? Number(id) : null;
   } catch {
     return null;
   }
@@ -67,7 +68,7 @@ export const listarContratos   = ()            => request("GET",   "/contratos")
 export const atualizarContrato = (id, status)  => request("PATCH", `/contratos/${id}/status`, { status });
 
 export const criarAvaliacao      = (dados)      => request("POST", "/avaliacao", dados);
-export const listarAvaliacoes    = ()            => request("GET",  "/avaliacao");
+export const listarAvaliacoes    = (_anuncioId) => request("GET",  "/avaliacao");
 export const editarAvaliacao     = (id, dados)  => request("PUT",  `/avaliacao/${id}`, dados);
 export const deletarAvaliacao    = (id)         => request("DELETE", `/avaliacao/${id}`);
 
