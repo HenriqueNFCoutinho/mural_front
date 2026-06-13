@@ -141,17 +141,16 @@ export default function MeusContratos() {
           {c.assinado_em ? new Date(c.assinado_em).toLocaleDateString("pt-BR") : "—"}
         </p>
 
-        {/* ── ações do PRESTADOR em PENDENTE ── */}
-        {c.status === "pendente" && ehPrestador && (
-          <div className="contrato-acoes">
-            <button className="btn-aceitar"  onClick={() => confirmar(c.id, "aceitar")}>Aceitar serviço</button>
-            <button className="btn-cancelar" onClick={() => confirmar(c.id, "recusar")}>Recusar</button>
-          </div>
-        )}
-
-        {/* ── ação do CLIENTE em PENDENTE ── */}
-        {c.status === "pendente" && ehCliente && (
-          <button className="btn-cancelar" onClick={() => confirmar(c.id, "cancelar")}>Cancelar solicitação</button>
+        {/* ── ações em PENDENTE: prestador OU cliente, nunca os dois ── */}
+        {c.status === "pendente" && (
+          ehPrestador && !ehCliente ? (
+            <div className="contrato-acoes">
+              <button className="btn-aceitar"  onClick={() => confirmar(c.id, "aceitar")}>Aceitar serviço</button>
+              <button className="btn-cancelar" onClick={() => confirmar(c.id, "recusar")}>Recusar</button>
+            </div>
+          ) : ehCliente && !ehPrestador ? (
+            <button className="btn-cancelar" onClick={() => confirmar(c.id, "cancelar")}>Cancelar solicitação</button>
+          ) : null
         )}
 
         {/* ── ação do PRESTADOR em ATIVO ── */}
