@@ -51,11 +51,13 @@ export default function DetalheAnuncio() {
   const [confirmarDelete, setConfirmarDelete] = useState(false);
   const [modalSolicitar, setModalSolicitar] = useState(false);
 
-  const [contratoParaAvaliar, setContratoParaAvaliar] = useState(null); 
+  // avaliação inline
+  const [contratoParaAvaliar, setContratoParaAvaliar] = useState(null); // contrato concluído sem avaliação
   const [jaAvaliou, setJaAvaliou] = useState(false);
   const [nota, setNota] = useState(0);
   const [comentario, setComentario] = useState("");
   const [enviandoAval, setEnviandoAval] = useState(false);
+  // avaliações filtradas só desse anúncio
   const [avaliacoesFiltradas, setAvaliacoesFiltradas] = useState([]);
 
   const logado = estaLogado();
@@ -76,6 +78,7 @@ export default function DetalheAnuncio() {
           setCategoria(cat);
         } catch {}
 
+        // Buscar contratos e avaliações juntos
         if (logado) {
           try {
             const [contratos, todasAvs] = await Promise.all([
@@ -86,17 +89,22 @@ export default function DetalheAnuncio() {
             const listaContratos = Array.isArray(contratos) ? contratos : [];
             const listaAvs = Array.isArray(todasAvs) ? todasAvs : [];
 
+            // Contratos desse anúncio
             const contratosDoAnuncio = listaContratos.filter(c => c.anuncio_id === a.id);
 
+            // Verificar se já solicitou
             const jaContratado = contratosDoAnuncio.some(c => c.status !== "cancelado");
             if (jaContratado) setSolicitado(true);
 
+            // IDs dos contratos desse anúncio para filtrar avaliações
             const idsContratos = contratosDoAnuncio.map(c => c.id);
 
+            // Filtrar avaliações só desse anúncio
             const avsFiltradas = listaAvs.filter(av => idsContratos.includes(av.contrato_id));
             setAvaliacoesFiltradas(avsFiltradas);
             setAvaliacoes(avsFiltradas);
 
+            // Verificar se tem contrato concluído sem avaliação (pode avaliar)
             const contratoConcluido = contratosDoAnuncio.find(c => c.status !== "cancelado");
             if (contratoConcluido) {
               const jaAv = avsFiltradas.some(av => av.contrato_id === contratoConcluido.id);
@@ -107,6 +115,7 @@ export default function DetalheAnuncio() {
               }
             }
           } catch {
+            // se não logado ou erro, busca avaliações sem filtro
             try {
               const avs = await listarAvaliacoes(a.id);
               setAvaliacoes(Array.isArray(avs) ? avs : []);
@@ -115,6 +124,7 @@ export default function DetalheAnuncio() {
             }
           }
         } else {
+          // não logado: mostra todas as avaliações sem filtro
           try {
             const avs = await listarAvaliacoes(a.id);
             setAvaliacoes(Array.isArray(avs) ? avs : []);
@@ -157,6 +167,7 @@ export default function DetalheAnuncio() {
       });
       setJaAvaliou(true);
       setContratoParaAvaliar(null);
+      // Adiciona a nova avaliação na lista
       const av = novaAv || { id: Date.now(), contrato_id: contratoParaAvaliar.id, nota, comentario };
       setAvaliacoes(prev => [...prev, av]);
       toast("Avaliação enviada!", "sucesso");
@@ -285,6 +296,7 @@ export default function DetalheAnuncio() {
           )}
         </div>
 
+        {/* Form de avaliação inline — só aparece se tem contrato concluído sem avaliação */}
         {contratoParaAvaliar && !ehDono && (
           <div className="aval-inline-card">
             <div className="aval-inline-titulo">Avalie este serviço</div>
@@ -314,10 +326,11 @@ export default function DetalheAnuncio() {
           </div>
         )}
 
+        {/* Lista de avaliações com média */}
         <div className="avaliacao-card">
           <div className="avaliacao-titulo">Avaliações do serviço</div>
           <div className="avaliacao-sub">Opiniões de quem já contratou</div>
-          <ListaAvaliacoes avaliacoes={avaliacoes} />
+          <ListaAvaliacoes avaliacoes={avaliacoes} setAvaliacoes={setAvaliacoes} />
         </div>
       </div>
 

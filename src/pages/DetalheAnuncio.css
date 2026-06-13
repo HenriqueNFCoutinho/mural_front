@@ -460,6 +460,7 @@
 }
 .btn-whatsapp:hover { background: #1EBE57; }
 
+/* ===== AVALIAÇÃO INLINE ===== */
 .aval-inline-card {
   background: var(--card-bg);
   border: 1.5px solid var(--accent);
