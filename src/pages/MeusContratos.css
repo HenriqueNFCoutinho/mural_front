@@ -295,3 +295,41 @@
 .aval-feita-top { display: flex; align-items: center; justify-content: space-between; }
 .aval-feita-label { font-size: 12px; font-weight: 500; color: var(--text-sub); }
 .aval-feita-coment { font-size: 14px; color: var(--text); font-style: italic; line-height: 1.5; }
+
+/* ── botões novos do fluxo de contrato ── */
+
+.contrato-acoes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.btn-aceitar {
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: #E1F5EE;
+  color: #1D9E75;
+  border: 1px solid #A8DFC9;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-aceitar:hover { background: #C2EFE0; border-color: #1D9E75; }
+
+.btn-concluir {
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: #EAF0FF;
+  color: #3B5FCC;
+  border: 1px solid #B0C4FF;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: all 0.15s;
+}
+.btn-concluir:hover { background: #D0DEFF; border-color: #3B5FCC; }
