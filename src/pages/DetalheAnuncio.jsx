@@ -179,7 +179,7 @@ export default function DetalheAnuncio() {
   if (carregando) return <div className="detalhe-root"><Navbar /><Loading texto="Carregando anúncio..." /></div>;
   if (!anuncio) return null;
 
-  const ehDono = idUsuario && idUsuario === anuncio.prestador_id;
+  const ehDono = idUsuario && Number(idUsuario) === Number(anuncio.prestador_id);
   const nomeExibido = anuncio.prestador_nome || prestador?.nome || `Prestador #${anuncio.prestador_id}`;
   const localExibido = prestador
     ? [prestador.bairro, prestador.cidade].filter(Boolean).join(", ") || "Localização não informada"
