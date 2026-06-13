@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { listarContratos, atualizarContrato, criarAvaliacao, listarAvaliacoes as listarTodasAvaliacoes, estaLogado } from "../services/api";
+import { listarContratos, atualizarContrato, criarAvaliacao, listarAvaliacoes as listarTodasAvaliacoes, estaLogado, meuId } from "../services/api";
 import Navbar from "../components/Navbar";
 import Loading from "../components/Loading";
 import Modal from "../components/Modal";
@@ -47,9 +47,11 @@ export default function MeusContratos() {
   const [contratos, setContratos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [modalCancelar, setModalCancelar] = useState(null);
+  const [modalConcluir, setModalConcluir] = useState(null);
   const [avaliando, setAvaliando] = useState(null);
   const [nota, setNota] = useState(0);
   const [comentario, setComentario] = useState("");
+  const usuarioId = Number(meuId());
 
   useEffect(() => {
     if (!estaLogado()) { navigate("/login"); return; }
@@ -81,6 +83,17 @@ export default function MeusContratos() {
     setModalCancelar(null);
   }
 
+  async function handleConcluir(id) {
+    try {
+      await atualizarContrato(id, "concluido");
+      setContratos(contratos.map(c => c.id === id ? { ...c, status: "concluido" } : c));
+      toast("Serviço marcado como concluído!", "sucesso");
+    } catch (err) {
+      toast(err?.erro || "Erro ao concluir contrato. Tente novamente.", "erro");
+    }
+    setModalConcluir(null);
+  }
+
   async function handleAvaliar(contratoId) {
     if (nota === 0) return;
     const avaliacao = { nota, comentario };
@@ -101,6 +114,9 @@ export default function MeusContratos() {
 
   function renderContrato(c, mostrarAvaliacao) {
     const cfg = STATUS_CONFIG[c.status] || STATUS_CONFIG.pendente;
+    const ehPrestador = c.prestador_id === usuarioId;
+    const ehCliente = c.cliente_id === usuarioId;
+
     return (
       <div key={c.id} className="contrato-card">
         <div className="contrato-top">
@@ -111,11 +127,15 @@ export default function MeusContratos() {
         <p className="contrato-prestador">Prestador: #{c.prestador_id}</p>
         <p className="contrato-data">{c.assinado_em ? new Date(c.assinado_em).toLocaleDateString("pt-BR") : "—"}</p>
 
-        {c.status === "pendente" && (
+        {c.status === "pendente" && ehCliente && (
           <button className="btn-cancelar" onClick={() => setModalCancelar(c.id)}>Cancelar solicitacao</button>
         )}
 
-        {mostrarAvaliacao && c.status === "concluido" && !c.avaliado && (
+        {c.status === "ativo" && ehPrestador && (
+          <button className="btn-concluir" onClick={() => setModalConcluir(c.id)}>Marcar como concluído</button>
+        )}
+
+        {mostrarAvaliacao && c.status === "concluido" && ehCliente && !c.avaliado && (
           avaliando === c.id ? (
             <div className="aval-box">
               <p className="aval-label">Avalie este servico:</p>
@@ -132,7 +152,7 @@ export default function MeusContratos() {
           )
         )}
 
-        {mostrarAvaliacao && c.status === "concluido" && c.avaliado && (
+        {mostrarAvaliacao && c.status === "concluido" && ehCliente && c.avaliado && (
           <div className="aval-feita">
             <div className="aval-feita-top">
               <span className="aval-feita-label">Sua avaliacao</span>
@@ -189,6 +209,15 @@ export default function MeusContratos() {
         perigo
         onConfirmar={() => handleCancelar(modalCancelar)}
         onCancelar={() => setModalCancelar(null)}
+      />
+
+      <Modal
+        aberto={modalConcluir !== null}
+        titulo="Concluir serviço"
+        mensagem="Confirma que o serviço foi realizado e deseja marcar este contrato como concluído?"
+        textoConfirmar="Sim, concluir"
+        onConfirmar={() => handleConcluir(modalConcluir)}
+        onCancelar={() => setModalConcluir(null)}
       />
     </div>
   );
