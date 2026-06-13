@@ -459,3 +459,114 @@
   transition: background 0.15s;
 }
 .btn-whatsapp:hover { background: #1EBE57; }
+
+.aval-inline-card {
+  background: var(--card-bg);
+  border: 1.5px solid var(--accent);
+  border-radius: 16px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.aval-inline-card.aval-inline-sucesso {
+  border-color: #1D9E75;
+  background: #F0FBF6;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.aval-inline-titulo {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.aval-inline-sub {
+  font-size: 13px;
+  color: var(--text-mute);
+  margin-top: -6px;
+}
+
+.aval-inline-stars-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.aval-inline-stars {
+  display: flex;
+  gap: 4px;
+}
+
+.aval-inline-star {
+  font-size: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--border);
+  transition: color 0.12s, transform 0.1s;
+  padding: 0;
+  line-height: 1;
+}
+.aval-inline-star:hover,
+.aval-inline-star.ativa { color: #E8A020; transform: scale(1.1); }
+
+.aval-inline-label {
+  font-size: 12px;
+  color: var(--text-mute);
+  min-height: 18px;
+}
+
+.aval-inline-textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.aval-inline-textarea:focus { border-color: var(--accent); }
+
+.aval-inline-btn {
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.aval-inline-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.aval-inline-btn:not(:disabled):hover { background: var(--accent-hover); }
+
+.aval-sucesso-icon {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: #1D9E75;
+  color: #fff;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.aval-sucesso-texto {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0A5C42;
+}
