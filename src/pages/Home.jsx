@@ -38,7 +38,7 @@ export default function Home() {
     const matchBusca = a.titulo?.toLowerCase().includes(termo) ||
                        a.descricao?.toLowerCase().includes(termo);
     const matchCat = catAtiva === null || a.categoria_id === catAtiva;
-    const ativo = !a.status || a.status === "ativo";
+    const ativo = !a.status || a.status?.toLowerCase() === "ativo";
     return matchBusca && matchCat && ativo;
   });
 

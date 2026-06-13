@@ -27,7 +27,7 @@ export default function PainelAdmin() {
   const [filtro, setFiltro] = useState("todos");
   const [confirmando, setConfirmando] = useState(null);
   const [editando, setEditando] = useState(null);
-  const [formEdit, setFormEdit] = useState({ nome: "", email: "" });
+  const [formEdit, setFormEdit] = useState({ nome: "", email: "", numero: "", bairro: "", cidade: "" });
   const [mostrarCriar, setMostrarCriar] = useState(false);
   const [formNovo, setFormNovo] = useState({ nome: "", email: "", senha: "", numero: "", perfil: "user", bairro: "", cidade: "" });
   const navigate = useNavigate();
@@ -72,7 +72,7 @@ export default function PainelAdmin() {
 
   function abrirEdicao(u) {
     setEditando(u.id);
-    setFormEdit({ nome: u.nome, email: u.email });
+    setFormEdit({ nome: u.nome || "", email: u.email || "", numero: u.numero || "", bairro: u.bairro || "", cidade: u.cidade || "" });
   }
 
   async function handleSalvarEdicao(id) {
@@ -175,6 +175,12 @@ export default function PainelAdmin() {
                       onChange={e => setFormEdit({ ...formEdit, nome: e.target.value })} />
                     <input className="edit-input" value={formEdit.email}
                       onChange={e => setFormEdit({ ...formEdit, email: e.target.value })} />
+                    <input className="edit-input" placeholder="Telefone" value={formEdit.numero}
+                      onChange={e => setFormEdit({ ...formEdit, numero: e.target.value })} />
+                    <input className="edit-input" placeholder="Bairro" value={formEdit.bairro}
+                      onChange={e => setFormEdit({ ...formEdit, bairro: e.target.value })} />
+                    <input className="edit-input" placeholder="Cidade" value={formEdit.cidade}
+                      onChange={e => setFormEdit({ ...formEdit, cidade: e.target.value })} />
                     <span></span><span></span>
                     <div className="row-actions">
                       <button className="btn-sim" onClick={() => handleSalvarEdicao(u.id)}>Salvar</button>

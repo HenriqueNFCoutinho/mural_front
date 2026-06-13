@@ -67,7 +67,7 @@ export const listarContratos   = ()            => request("GET",   "/contratos")
 export const atualizarContrato = (id, status)  => request("PATCH", `/contratos/${id}/status`, { status });
 
 export const criarAvaliacao      = (dados)      => request("POST", "/avaliacao", dados);
-export const listarAvaliacoes    = (_anuncioId) => request("GET",  "/avaliacao");
+export const listarAvaliacoes    = ()            => request("GET",  "/avaliacao");
 export const editarAvaliacao     = (id, dados)  => request("PUT",  `/avaliacao/${id}`, dados);
 export const deletarAvaliacao    = (id)         => request("DELETE", `/avaliacao/${id}`);
 
